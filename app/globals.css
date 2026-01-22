@@ -3,6 +3,38 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --header-height: 56px;
+  --category-tabs-height: 56px;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  padding-top: var(--header-height);
+}
+
+body::after {
+  content: '';
+  display: block;
+  height: var(--category-tabs-height);
+}
+
+@media (max-width: 768px) {
+  :root {
+    --header-height: 52px;
+  }
+
+  body::after {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --header-height: 48px;
+  }
 }
 
 @theme inline {
