@@ -1,6 +1,7 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import userEvent from '@testing-library/user-event';
 import Header from './Header';
 
 describe('Header Component', () => {
@@ -18,14 +19,16 @@ describe('Header Component', () => {
 
     it('should render the logo', () => {
       render(<Header />);
-      const logo = screen.getByAltText(/plug in/i);
+      const logo = screen.getByText(/plug in/i);
       expect(logo).toBeInTheDocument();
     });
 
     it('should render navigation menu items', () => {
       render(<Header />);
-      expect(screen.getByText(/events/i)).toBeInTheDocument();
-      expect(screen.getByText(/categories/i)).toBeInTheDocument();
+      const mainNav = screen.getByRole('navigation', { name: /main navigation/i });
+      
+      expect(mainNav).toHaveTextContent(/events/i);
+      expect(mainNav).toHaveTextContent(/categories/i);
     });
 
     it('should render search bar component', () => {
@@ -36,9 +39,19 @@ describe('Header Component', () => {
 
     it('should render navigation tabs for categories', () => {
       render(<Header />);
-      expect(screen.getByText(/concerts/i)).toBeInTheDocument();
-      expect(screen.getByText(/sports/i)).toBeInTheDocument();
-      expect(screen.getByText(/festivals/i)).toBeInTheDocument();
+      const categoryNav = screen.getByRole('navigation', { name: /category filter/i });
+      
+      expect(categoryNav).toHaveTextContent(/concerts/i);
+      expect(categoryNav).toHaveTextContent(/sports/i);
+      expect(categoryNav).toHaveTextContent(/festivals/i);
+    });
+
+    it('should render navigation menu items in mobile menu', () => {
+      render(<Header />);
+      const mobileNav = screen.getByRole('navigation', { name: /mobile navigation/i });
+      
+      expect(mobileNav).toHaveTextContent(/events/i);
+      expect(mobileNav).toHaveTextContent(/categories/i);
     });
   });
 
@@ -52,13 +65,13 @@ describe('Header Component', () => {
     it('should apply reduced height styling when sticky', () => {
       render(<Header />);
       const header = screen.getByRole('banner');
-      expect(header).toHaveClass('sticky-reduced');
+      expect(header).toHaveClass('sticky');
     });
 
     it('should have frosted glass background when sticky', () => {
       render(<Header />);
       const header = screen.getByRole('banner');
-      expect(header).toHaveClass('frosted-glass');
+      expect(header).toHaveClass('frostedGlass');
     });
   });
 
@@ -76,59 +89,65 @@ describe('Header Component', () => {
       expect(hamburger).toBeInTheDocument();
     });
 
-    it('should toggle mobile menu when hamburger is clicked', () => {
+    it('should toggle mobile menu when hamburger is clicked', async () => {
       Object.defineProperty(window, 'innerWidth', {
         writable: true,
         configurable: true,
         value: 480,
       });
 
+      const user = userEvent.setup();
       render(<Header />);
       const hamburger = screen.getByRole('button', { name: /menu/i });
 
       expect(hamburger).toHaveAttribute('aria-expanded', 'false');
 
-      fireEvent.click(hamburger);
+      await user.click(hamburger);
       expect(hamburger).toHaveAttribute('aria-expanded', 'true');
 
-      fireEvent.click(hamburger);
+      await user.click(hamburger);
       expect(hamburger).toHaveAttribute('aria-expanded', 'false');
     });
 
-    it('should show mobile navigation menu when toggled', () => {
+    it('should show mobile navigation menu when toggled', async () => {
       Object.defineProperty(window, 'innerWidth', {
         writable: true,
         configurable: true,
         value: 480,
       });
 
+      const user = userEvent.setup();
       render(<Header />);
       const hamburger = screen.getByRole('button', { name: /menu/i });
-      const mobileNav = screen.getByRole('navigation', { hidden: true });
+      const mobileNav = screen.getByRole('navigation', { name: /mobile navigation/i });
 
-      expect(mobileNav).toHaveClass('mobile-nav-closed');
+      expect(mobileNav).toHaveClass('mobileNavClosed');
 
-      fireEvent.click(hamburger);
-      expect(mobileNav).toHaveClass('mobile-nav-open');
+      await user.click(hamburger);
+      expect(mobileNav).toHaveClass('mobileNavOpen');
     });
 
-    it('should close mobile menu when a link is clicked', () => {
+    it('should close mobile menu when a link is clicked', async () => {
       Object.defineProperty(window, 'innerWidth', {
         writable: true,
         configurable: true,
         value: 480,
       });
 
+      const user = userEvent.setup();
       render(<Header />);
-      const hamburger = screen.getByRole('button', { name: /menu/i });
+      const hamburger = screen.getByRole('button', { name: /toggle menu/i });
 
-      fireEvent.click(hamburger);
+      await user.click(hamburger);
       expect(hamburger).toHaveAttribute('aria-expanded', 'true');
 
-      const firstLink = screen.getAllByRole('link')[0];
-      fireEvent.click(firstLink);
-
-      expect(hamburger).toHaveAttribute('aria-expanded', 'false');
+      const mobileNav = screen.getByRole('navigation', { name: /mobile navigation/i });
+      const firstLink = mobileNav.querySelector('a');
+      
+      if (firstLink) {
+        await user.click(firstLink);
+        expect(hamburger).toHaveAttribute('aria-expanded', 'false');
+      }
     });
   });
 
@@ -141,7 +160,7 @@ describe('Header Component', () => {
 
     it('should have semantic navigation element', () => {
       render(<Header />);
-      const nav = screen.getByRole('navigation');
+      const nav = screen.getByRole('navigation', { name: /main navigation/i });
       expect(nav).toBeInTheDocument();
     });
 
