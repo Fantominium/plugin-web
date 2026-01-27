@@ -8,12 +8,15 @@ export default function FeaturedEvents() {
 
   return (
     <section style={{
-      padding: '60px 24px',
+      padding: 'clamp(20px, 5vw, 60px) clamp(12px, 4vw, 24px)',
       background: '#f5f5f5',
+      width: '100%',
+      boxSizing: 'border-box',
+      overflowX: 'hidden',
     }}>
-      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+      <div style={{ maxWidth: '1200px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
         <h2 style={{
-          fontSize: '2.5rem',
+          fontSize: 'clamp(1.5rem, 5vw, 2.5rem)',
           marginBottom: '40px',
           textAlign: 'center',
           color: '#1a1a2e'
@@ -24,7 +27,9 @@ export default function FeaturedEvents() {
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-          gap: '24px'
+          gap: 'clamp(12px, 3vw, 24px)',
+          width: '100%',
+          boxSizing: 'border-box'
         }}>
           {events.map(event => (
             <div
@@ -32,10 +37,12 @@ export default function FeaturedEvents() {
               style={{
                 background: 'white',
                 borderRadius: '12px',
-                padding: '20px',
+                padding: 'clamp(12px, 3vw, 20px)',
                 boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
                 cursor: 'pointer',
-                transition: 'transform 0.2s'
+                transition: 'transform 0.2s',
+                width: '100%',
+                boxSizing: 'border-box'
               }}
             >
               <div style={{
@@ -63,11 +70,13 @@ export default function FeaturedEvents() {
 
         <div style={{
           marginTop: '60px',
-          padding: '40px',
+          padding: 'clamp(20px, 4vw, 40px)',
           background: '#1a1a2e',
           borderRadius: '12px',
           color: 'white',
-          textAlign: 'center'
+          textAlign: 'center',
+          width: '100%',
+          boxSizing: 'border-box'
         }}>
           <h3 style={{ marginBottom: '16px' }}>More Events Coming</h3>
           <p>Stay tuned for more exciting events happening in Barbados!</p>

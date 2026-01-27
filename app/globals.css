@@ -37,6 +37,24 @@ body::after {
   }
 }
 
+@media (max-width: 412px) {
+  :root {
+    --header-height: 44px;
+  }
+
+  body {
+    padding-top: var(--header-height);
+    overflow-x: hidden;
+  }
+}
+
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

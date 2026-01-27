@@ -226,6 +226,9 @@ Jest is configured as the test runner. Test files colocate with source code usin
 - Component tests for React components: `app/components/UserCard/UserCard.test.tsx`
 - Use descriptive test names: `describe('UserCard', () => { it('renders user name and avatar', () => { ... }); })`
 - Mock Next.js modules (e.g., `next/image`, `next/font`) as needed.
+- Use a TDD approach: write tests before implementing features.
+- Structure tests in the AAA pattern (Arrange, Act, Assert).
+- Tests should always have the user perspective in mind.
 
 **Running Tests:**
 - `yarn test` — Run all tests

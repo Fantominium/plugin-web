@@ -497,6 +497,38 @@
   }
 }
 
+@media (max-width: 412px) {
+  .header {
+    padding: 8px 10px;
+    gap: 8px;
+    min-height: 44px;
+  }
+
+  .logo {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+  }
+
+  .logoText {
+    font-size: 7px;
+    letter-spacing: 0.2px;
+  }
+
+  .hamburger {
+    padding: 6px;
+  }
+
+  .hamburgerLine {
+    width: 18px;
+    height: 2px;
+  }
+
+  .mobileNav {
+    top: 44px;
+  }
+}
+
 /* Dark mode is default, but ensure proper contrast */
 @media (prefers-color-scheme: dark) {
   .header {
