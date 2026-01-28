@@ -48,7 +48,7 @@ describe('Header Component', () => {
 
     it('should render navigation menu items in mobile menu', () => {
       render(<Header />);
-      const mobileNav = screen.getByRole('navigation', { name: /mobile navigation/i });
+      const mobileNav = screen.getByRole('navigation', { name: /mobile navigation/i, hidden: true });
       
       expect(mobileNav).toHaveTextContent(/events/i);
       expect(mobileNav).toHaveTextContent(/categories/i);
@@ -85,11 +85,11 @@ describe('Header Component', () => {
       });
 
       render(<Header />);
-      const hamburger = screen.getByRole('button', { name: /menu/i });
+      const hamburger = screen.getByRole('button', { name: /open menu/i });
       expect(hamburger).toBeInTheDocument();
     });
 
-    it('should toggle mobile menu when hamburger is clicked', async () => {
+    it('should toggle mobile menu and update button label', async () => {
       Object.defineProperty(window, 'innerWidth', {
         writable: true,
         configurable: true,
@@ -98,15 +98,17 @@ describe('Header Component', () => {
 
       const user = userEvent.setup();
       render(<Header />);
-      const hamburger = screen.getByRole('button', { name: /menu/i });
+      const hamburger = screen.getByRole('button', { name: /open menu/i });
 
       expect(hamburger).toHaveAttribute('aria-expanded', 'false');
 
       await user.click(hamburger);
       expect(hamburger).toHaveAttribute('aria-expanded', 'true');
+      expect(hamburger).toHaveAccessibleName(/close menu/i);
 
       await user.click(hamburger);
       expect(hamburger).toHaveAttribute('aria-expanded', 'false');
+      expect(hamburger).toHaveAccessibleName(/open menu/i);
     });
 
     it('should show mobile navigation menu when toggled', async () => {
@@ -118,13 +120,28 @@ describe('Header Component', () => {
 
       const user = userEvent.setup();
       render(<Header />);
-      const hamburger = screen.getByRole('button', { name: /menu/i });
-      const mobileNav = screen.getByRole('navigation', { name: /mobile navigation/i });
+      const hamburger = screen.getByRole('button', { name: /open menu/i });
+      const mobileNav = screen.getByRole('navigation', { name: /mobile navigation/i, hidden: true });
+      const mobileDialog = screen.getByRole('dialog', { hidden: true });
 
-      expect(mobileNav).toHaveClass('mobileNavClosed');
+      expect(mobileDialog).toHaveAttribute('aria-label', 'Mobile menu');
+      expect(mobileDialog).toHaveClass('mobileNavClosed');
 
       await user.click(hamburger);
-      expect(mobileNav).toHaveClass('mobileNavOpen');
+      expect(mobileDialog).toHaveClass('mobileNavOpen');
+    });
+
+    it('should render mobile navigation as a list', () => {
+      Object.defineProperty(window, 'innerWidth', {
+        writable: true,
+        configurable: true,
+        value: 480,
+      });
+
+      render(<Header />);
+      const mobileNavList = screen.getByRole('list', { name: /mobile menu items/i, hidden: true });
+      expect(mobileNavList).toBeInTheDocument();
+      expect(screen.getAllByRole('listitem', { hidden: true }).length).toBeGreaterThan(0);
     });
 
     it('should close mobile menu when a link is clicked', async () => {
@@ -136,17 +153,18 @@ describe('Header Component', () => {
 
       const user = userEvent.setup();
       render(<Header />);
-      const hamburger = screen.getByRole('button', { name: /toggle menu/i });
+      const hamburger = screen.getByRole('button', { name: /open menu/i });
 
       await user.click(hamburger);
       expect(hamburger).toHaveAttribute('aria-expanded', 'true');
 
-      const mobileNav = screen.getByRole('navigation', { name: /mobile navigation/i });
+      const mobileNav = screen.getByRole('navigation', { name: /mobile navigation/i, hidden: true });
       const firstLink = mobileNav.querySelector('a');
-      
+
       if (firstLink) {
         await user.click(firstLink);
         expect(hamburger).toHaveAttribute('aria-expanded', 'false');
+        expect(hamburger).toHaveAccessibleName(/open menu/i);
       }
     });
   });
