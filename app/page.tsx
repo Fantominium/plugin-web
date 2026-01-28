@@ -1,7 +1,7 @@
-import Hero from "./components/Hero";
-import AppPromotion from "./components/AppPromotion";
-import Categories from "./components/Categories";
-import FeaturedEvents from "./components/FeaturedEvents";
+import Hero from "@/app/components/Hero/Hero";
+import AppPromotion from "@/app/components/AppPromotion/AppPromotion";
+import Categories from "@/app/components/Categories/Categories";
+import FeaturedEvents from "@/app/components/FeaturedEvents/FeaturedEvents";
 
 export default function Home() {
   return (

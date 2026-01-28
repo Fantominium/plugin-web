@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import SearchBar from './SearchBar';
+import SearchBar from '@/app/components/SearchBar/SearchBar';
 import styles from './Header.module.css';
 
 const CATEGORY_TABS = [
