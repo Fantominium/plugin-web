@@ -1,0 +1,28 @@
+.eventCard {
+  display: block;
+  background: white;
+  border-radius: 12px;
+  padding: clamp(12px, 3vw, 20px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
+  text-decoration: none;
+  color: inherit;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  }
+
+  &:focus {
+    outline: 2px solid rgba(255, 107, 107, 0.5);
+    outline-offset: 4px;
+    border-radius: 12px;
+  }
+
+  &:active {
+    transform: translateY(-2px);
+  }
+}

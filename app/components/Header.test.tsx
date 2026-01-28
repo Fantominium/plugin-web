@@ -7,7 +7,7 @@ import Header from './Header';
 describe('Header Component', () => {
   beforeEach(() => {
     // Reset window scroll position before each test
-    globalThis.scrollY = 0;
+    window.scrollY = 0;
   });
 
   describe('Rendering', () => {

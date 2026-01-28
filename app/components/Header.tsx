@@ -2,8 +2,8 @@
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import SearchBar from '@/app/components/SearchBar/SearchBar';
-import styles from './Header.module.css';
+import SearchBar from './SearchBar/SearchBar';
+import styles from './Header/Header.module.css';
 
 const CATEGORY_TABS = [
   { id: 'concerts', label: 'Concerts', icon: '🎵' },

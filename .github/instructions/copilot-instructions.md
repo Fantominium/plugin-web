@@ -61,6 +61,7 @@ Use kebab-case for utility files and directories (e.g., `user-session.ts`, `data
   ```
 - Use `const` assertions for literal types and readonly arrays where appropriate.
 - Document complex types with JSDoc comments for IDE IntelliSense.
+- Always ensure the solutions provided are linted and type-checked without errors, and should always pass linting checks and tests prior to submission into the project codebase.
 
 **Next.js Patterns: Server vs. Client Components:**
 
@@ -227,6 +228,7 @@ Jest is configured as the test runner. Test files colocate with source code usin
 - Use descriptive test names: `describe('UserCard', () => { it('renders user name and avatar', () => { ... }); })`
 - Mock Next.js modules (e.g., `next/image`, `next/font`) as needed.
 - Use a TDD approach: write tests before implementing features.
+- Also follow the red -green-refactor cycle.
 - Structure tests in the AAA pattern (Arrange, Act, Assert).
 - Tests should always have the user perspective in mind.
 

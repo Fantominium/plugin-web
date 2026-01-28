@@ -1,3 +1,8 @@
+'use client';
+
+import Link from 'next/link';
+import styles from './FeaturedEvents.module.css';
+
 export default function FeaturedEvents() {
   const events = [
     { id: 1, title: 'Concert Night', date: 'Feb 15', category: 'Concerts' },
@@ -32,18 +37,10 @@ export default function FeaturedEvents() {
           boxSizing: 'border-box'
         }}>
           {events.map(event => (
-            <div
+            <Link
               key={event.id}
-              style={{
-                background: 'white',
-                borderRadius: '12px',
-                padding: 'clamp(12px, 3vw, 20px)',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                cursor: 'pointer',
-                transition: 'transform 0.2s',
-                width: '100%',
-                boxSizing: 'border-box'
-              }}
+              href={`/events/${event.id}`}
+              className={styles.eventCard}
             >
               <div style={{
                 width: '100%',
@@ -64,7 +61,7 @@ export default function FeaturedEvents() {
               }}>
                 {event.category}
               </span>
-            </div>
+            </Link>
           ))}
         </div>
 
