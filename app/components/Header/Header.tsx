@@ -99,6 +99,21 @@ export default function Header() {
             <div className={styles.logo}>
               <span className={styles.logoText}>PLUG IN</span>
             </div>
+
+            {/* Hamburger Menu Button */}
+            <button
+              ref={hamburgerButtonRef}
+              className={`${styles.hamburger} ${mobileMenuOpen ? styles.hamburgerOpen : ''}`}
+              onClick={toggleMobileMenu}
+              aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={mobileMenuOpen}
+              aria-controls="mobile-menu-dialog"
+              aria-haspopup="dialog"
+            >
+              <span className={styles.hamburgerLine} aria-hidden="true"></span>
+              <span className={styles.hamburgerLine} aria-hidden="true"></span>
+              <span className={styles.hamburgerLine} aria-hidden="true"></span>
+            </button>
           </div>
 
           {/* Desktop Navigation */}
@@ -125,45 +140,7 @@ export default function Header() {
           <div className={styles.desktopSearch}>
             <SearchBar />
           </div>
-
-          {/* Hamburger Menu Button */}
-          <button
-            ref={hamburgerButtonRef}
-            className={`${styles.hamburger} ${mobileMenuOpen ? styles.hamburgerOpen : ''}`}
-            onClick={toggleMobileMenu}
-            aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
-            aria-expanded={mobileMenuOpen}
-            aria-controls="mobile-menu-dialog"
-            aria-haspopup="dialog"
-          >
-            <span className={styles.hamburgerLine} aria-hidden="true"></span>
-            <span className={styles.hamburgerLine} aria-hidden="true"></span>
-            <span className={styles.hamburgerLine} aria-hidden="true"></span>
-          </button>
         </header>
-
-        {/* Category Tabs */}
-        <div className={styles.categoryTabsContainer}>
-          <nav
-            className={styles.categoryTabs}
-            aria-label="Category filter"
-            role="navigation"
-          >
-            {CATEGORY_TABS.map((tab) => (
-              <button
-                key={tab.id}
-                className={`${styles.categoryTab} ${
-                  activeTab === tab.id ? styles.active : ''
-                }`}
-                onClick={() => setActiveTab(tab.id)}
-                aria-pressed={activeTab === tab.id}
-              >
-                <span className={styles.tabIcon}>{tab.icon}</span>
-                <span className={styles.tabLabel}>{tab.label}</span>
-              </button>
-            ))}
-          </nav>
-        </div>
       </div>
 
       {/* Mobile Navigation Menu */}
@@ -246,7 +223,7 @@ export default function Header() {
 
           <div className={styles.mobileNavDivider}></div>
 
-          <div className={styles.mobileTabsContainer}>
+          <nav className={styles.mobileTabsContainer} aria-label="Event categories">
             <ul className={styles.mobileTabsList} aria-label="Category shortcuts">
               {CATEGORY_TABS.map((tab) => (
                 <li key={tab.id} className={styles.mobileTabsListItem}>
@@ -258,6 +235,7 @@ export default function Header() {
                       setActiveTab(tab.id);
                       closeMobileMenu();
                     }}
+                    aria-pressed={activeTab === tab.id}
                   >
                     <span className={styles.tabIcon}>{tab.icon}</span>
                     <span className={styles.tabLabel}>{tab.label}</span>
@@ -265,7 +243,7 @@ export default function Header() {
                 </li>
               ))}
             </ul>
-          </div>
+          </nav>
         </nav>
       </dialog>
 

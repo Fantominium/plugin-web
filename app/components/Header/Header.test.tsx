@@ -37,13 +37,11 @@ describe('Header Component', () => {
       expect(searchInput).toBeInTheDocument();
     });
 
-    it('should render navigation tabs for categories', () => {
+    it('should not render duplicate category header strip', () => {
       render(<Header />);
-      const categoryNav = screen.getByRole('navigation', { name: /category filter/i });
-      
-      expect(categoryNav).toHaveTextContent(/concerts/i);
-      expect(categoryNav).toHaveTextContent(/sports/i);
-      expect(categoryNav).toHaveTextContent(/festivals/i);
+      expect(
+        screen.queryByRole('navigation', { name: /category filter/i })
+      ).not.toBeInTheDocument();
     });
 
     it('should render navigation menu items in mobile menu', () => {
@@ -128,6 +126,14 @@ describe('Header Component', () => {
 
       await user.click(hamburger);
       expect(mobileDialog).toHaveClass('mobileNavOpen');
+
+      const categoryNav = screen.getByRole('navigation', {
+        name: /event categories/i,
+        hidden: true,
+      });
+      expect(categoryNav).toHaveTextContent(/concerts/i);
+      expect(categoryNav).toHaveTextContent(/sports/i);
+      expect(categoryNav).toHaveTextContent(/festivals/i);
     });
 
     it('should render mobile navigation as a list', () => {

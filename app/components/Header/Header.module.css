@@ -60,6 +60,7 @@
 .logoSection {
   display: flex;
   align-items: center;
+  gap: 10px;
   flex-shrink: 0;
   margin-right: 8px;
 }
@@ -168,7 +169,7 @@
 
 /* Hamburger Menu */
 .hamburger {
-  display: none;
+  display: flex;
   flex-direction: column;
   gap: 5px;
   background: none;
@@ -178,10 +179,6 @@
   flex-shrink: 0;
   z-index: 51;
   transition: transform 0.3s ease;
-
-  @media (max-width: 768px) {
-    display: flex;
-  }
 
   &:hover {
     transform: scale(1.05);
@@ -221,22 +218,7 @@
 
 /* Category Tabs Container */
 .categoryTabsContainer {
-  background: rgba(26, 26, 46, 0.5);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  overflow-x: auto;
-  overflow-y: hidden;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
-
-  @media (max-width: 768px) {
-    display: none;
-  }
+  display: none;
 }
 
 .categoryTabs {
@@ -315,37 +297,41 @@
 
 /* Mobile Navigation Menu */
 .mobileNav {
-  display: none;
+  display: flex;
+  flex-direction: column;
   position: fixed;
-  inset: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(26, 26, 46, 0.98);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  top: 74px;
+  left: 16px;
+  width: min(360px, calc(100vw - 32px));
+  max-height: calc(100vh - 90px);
+  margin: 0;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 14px;
+  background: rgba(26, 26, 46, 0.97);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
   z-index: 60;
-  overflow-y: auto;
+  overflow: hidden;
   -webkit-overflow-scrolling: touch;
   opacity: 0;
   pointer-events: none;
   visibility: hidden;
-  transition: opacity 0.2s ease, visibility 0.2s ease;
-
-  @media (max-width: 768px) {
-    display: flex;
-    flex-direction: column;
-  }
+  transform: translateY(-8px) scale(0.98);
+  transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
 
   &.mobileNavOpen {
     pointer-events: auto;
     opacity: 1;
     visibility: visible;
+    transform: translateY(0) scale(1);
   }
 
   &.mobileNavClosed {
     pointer-events: none;
     opacity: 0;
     visibility: hidden;
+    transform: translateY(-8px) scale(0.98);
   }
 }
 
@@ -353,7 +339,7 @@
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  padding: 16px 20px;
+  padding: 12px 12px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   flex-shrink: 0;
 }
@@ -410,10 +396,10 @@
 }
 
 .mobileNavContent {
-  padding: 24px 20px 32px;
+  padding: 16px 16px 18px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
   flex: 1;
   box-sizing: border-box;
   overflow-y: auto;
@@ -456,7 +442,7 @@
 .mobileNavDivider {
   height: 1px;
   background: rgba(255, 255, 255, 0.1);
-  margin: 12px 0;
+  margin: 8px 0;
 }
 
 .mobileTabsContainer {
@@ -614,7 +600,7 @@
   }
 
   .mobileNav {
-    background: rgba(26, 26, 46, 0.98);
+    background: rgba(26, 26, 46, 0.97);
   }
 }
 
@@ -632,5 +618,6 @@
   .mobileTab {
     transition: none;
     animation: none;
+    transform: none;
   }
 }
