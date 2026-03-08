@@ -116,26 +116,6 @@ export default function Header() {
             </button>
           </div>
 
-          {/* Desktop Navigation */}
-          <nav
-            role="navigation"
-            className={`${styles.desktopNav} ${styles.navigation}`}
-            aria-label="Main navigation"
-          >
-            <Link href="/" className={styles.navLink}>
-              Home
-            </Link>
-            <Link href="/events" className={styles.navLink}>
-              Events
-            </Link>
-            <Link href="/categories" className={styles.navLink}>
-              Categories
-            </Link>
-            <Link href="/about" className={styles.navLink}>
-              About
-            </Link>
-          </nav>
-
           {/* Desktop Search Bar */}
           <div className={styles.desktopSearch}>
             <SearchBar />

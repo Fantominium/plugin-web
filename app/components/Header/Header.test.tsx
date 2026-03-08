@@ -23,12 +23,16 @@ describe('Header Component', () => {
       expect(logo).toBeInTheDocument();
     });
 
-    it('should render navigation menu items', () => {
+    it('should not render main navigation links in visible header', () => {
       render(<Header />);
-      const mainNav = screen.getByRole('navigation', { name: /main navigation/i });
-      
-      expect(mainNav).toHaveTextContent(/events/i);
-      expect(mainNav).toHaveTextContent(/categories/i);
+      expect(
+        screen.queryByRole('navigation', { name: /main navigation/i })
+      ).not.toBeInTheDocument();
+
+      expect(screen.queryByRole('link', { name: /^home$/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole('link', { name: /^events$/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole('link', { name: /^categories$/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole('link', { name: /^about$/i })).not.toBeInTheDocument();
     });
 
     it('should render search bar component', () => {
@@ -204,9 +208,9 @@ describe('Header Component', () => {
       expect(header).toBeInTheDocument();
     });
 
-    it('should have semantic navigation element', () => {
+    it('should have semantic navigation element for mobile menu', () => {
       render(<Header />);
-      const nav = screen.getByRole('navigation', { name: /main navigation/i });
+      const nav = screen.getByRole('navigation', { name: /mobile navigation/i, hidden: true });
       expect(nav).toBeInTheDocument();
     });
 
