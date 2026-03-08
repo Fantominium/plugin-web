@@ -6,11 +6,11 @@ import SearchBar from '@/app/components/SearchBar/SearchBar';
 import styles from './Header.module.css';
 
 const CATEGORY_TABS = [
-  { id: 'concerts', label: 'Concerts', icon: '🎵' },
-  { id: 'sports', label: 'Sports', icon: '⚽' },
-  { id: 'festivals', label: 'Festivals', icon: '🎉' },
-  { id: 'food', label: 'Food & Drink', icon: '🍽️' },
-  { id: 'art', label: 'Art & Culture', icon: '🎨' },
+  { id: 'concerts', label: 'Concerts' },
+  { id: 'sports', label: 'Sports' },
+  { id: 'festivals', label: 'Festivals' },
+  { id: 'food', label: 'Food & Drink' },
+  { id: 'art', label: 'Art & Culture' },
 ];
 
 export default function Header() {
@@ -237,7 +237,6 @@ export default function Header() {
                     }}
                     aria-pressed={activeTab === tab.id}
                   >
-                    <span className={styles.tabIcon}>{tab.icon}</span>
                     <span className={styles.tabLabel}>{tab.label}</span>
                   </button>
                 </li>

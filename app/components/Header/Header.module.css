@@ -286,12 +286,11 @@
 }
 
 .tabLabel {
-  @media (max-width: 1024px) {
-    font-size: 12px;
-  }
+  font-size: 11px;
+  line-height: 1;
 
-  @media (max-width: 640px) {
-    display: none;
+  @media (max-width: 1024px) {
+    font-size: 11px;
   }
 }
 
@@ -446,9 +445,7 @@
 }
 
 .mobileTabsContainer {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  display: block;
   padding: 8px 0;
 }
 
@@ -457,8 +454,8 @@
   padding: 0;
   margin: 0;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
 }
 
 .mobileTabsListItem {
@@ -467,18 +464,18 @@
 
 .mobileTab {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
   background: none;
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: rgba(255, 255, 255, 0.6);
-  padding: 12px 8px;
-  border-radius: 8px;
+  padding: 8px 10px;
+  border-radius: 999px;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 500;
   transition: all 0.2s ease;
+  min-height: 34px;
 
   &:hover {
     color: rgba(255, 255, 255, 0.9);
@@ -490,10 +487,6 @@
     color: #ffffff;
     background: rgba(255, 107, 107, 0.2);
     border: 1px solid rgba(255, 107, 107, 0.4);
-
-    .tabIcon {
-      transform: scale(1.15);
-    }
   }
 
   &:focus {

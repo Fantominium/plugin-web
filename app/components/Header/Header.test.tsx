@@ -136,6 +136,29 @@ describe('Header Component', () => {
       expect(categoryNav).toHaveTextContent(/festivals/i);
     });
 
+    it('should render category controls as text-only pills (no icons)', async () => {
+      Object.defineProperty(globalThis, 'innerWidth', {
+        writable: true,
+        configurable: true,
+        value: 480,
+      });
+
+      const user = userEvent.setup();
+      render(<Header />);
+      const hamburger = screen.getByRole('button', { name: /open menu/i });
+
+      await user.click(hamburger);
+
+      const categoryButtons = screen.getAllByRole('button', {
+        name: /concerts|sports|festivals|food & drink|art & culture/i,
+      });
+
+      expect(categoryButtons).toHaveLength(5);
+      categoryButtons.forEach((button) => {
+        expect(button.textContent).not.toMatch(/[🎵⚽🎉🍽️🎨]/u);
+      });
+    });
+
     it('should render mobile navigation as a list', () => {
       Object.defineProperty(globalThis, 'innerWidth', {
         writable: true,
