@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useCallback, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import SearchBar from '@/app/components/SearchBar/SearchBar';
 import styles from './Header.module.css';
 
@@ -90,10 +90,7 @@ export default function Header() {
       </a>
 
       <div className={styles.headerWrapper}>
-        <header
-          role="banner"
-          className={`${styles.header} ${styles.sticky} ${styles.frostedGlass}`}
-        >
+        <header className={`${styles.header} ${styles.sticky} ${styles.frostedGlass}`}>
           {/* Logo Section */}
           <div className={styles.logoSection}>
             <div className={styles.logo}>
@@ -102,6 +99,7 @@ export default function Header() {
 
             {/* Hamburger Menu Button */}
             <button
+              type="button"
               ref={hamburgerButtonRef}
               className={`${styles.hamburger} ${mobileMenuOpen ? styles.hamburgerOpen : ''}`}
               onClick={toggleMobileMenu}
@@ -135,6 +133,7 @@ export default function Header() {
       >
         <div className={styles.mobileNavHeader}>
           <button
+            type="button"
             className={styles.mobileCloseButton}
             onClick={closeMobileMenu}
             aria-label="Close menu"
@@ -155,12 +154,7 @@ export default function Header() {
             </svg>
           </button>
         </div>
-        <nav
-          id="mobile-nav"
-          role="navigation"
-          className={styles.mobileNavContent}
-          aria-label="Mobile navigation"
-        >
+        <nav id="mobile-nav" className={styles.mobileNavContent} aria-label="Mobile navigation">
           <ul className={styles.mobileNavList} aria-label="Mobile menu items">
             <li className={styles.mobileNavListItem}>
               <Link
@@ -173,29 +167,17 @@ export default function Header() {
               </Link>
             </li>
             <li className={styles.mobileNavListItem}>
-              <Link
-                href="/events"
-                className={styles.mobileNavLink}
-                onClick={closeMobileMenu}
-              >
+              <Link href="/events" className={styles.mobileNavLink} onClick={closeMobileMenu}>
                 Events
               </Link>
             </li>
             <li className={styles.mobileNavListItem}>
-              <Link
-                href="/categories"
-                className={styles.mobileNavLink}
-                onClick={closeMobileMenu}
-              >
+              <Link href="/categories" className={styles.mobileNavLink} onClick={closeMobileMenu}>
                 Categories
               </Link>
             </li>
             <li className={styles.mobileNavListItem}>
-              <Link
-                href="/about"
-                className={styles.mobileNavLink}
-                onClick={closeMobileMenu}
-              >
+              <Link href="/about" className={styles.mobileNavLink} onClick={closeMobileMenu}>
                 About
               </Link>
             </li>
@@ -208,9 +190,8 @@ export default function Header() {
               {CATEGORY_TABS.map((tab) => (
                 <li key={tab.id} className={styles.mobileTabsListItem}>
                   <button
-                    className={`${styles.mobileTab} ${
-                      activeTab === tab.id ? styles.active : ''
-                    }`}
+                    type="button"
+                    className={`${styles.mobileTab} ${activeTab === tab.id ? styles.active : ''}`}
                     onClick={() => {
                       setActiveTab(tab.id);
                       closeMobileMenu();

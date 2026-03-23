@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
@@ -26,7 +25,7 @@ describe('Header Component', () => {
     it('should not render main navigation links in visible header', () => {
       render(<Header />);
       expect(
-        screen.queryByRole('navigation', { name: /main navigation/i })
+        screen.queryByRole('navigation', { name: /main navigation/i }),
       ).not.toBeInTheDocument();
 
       expect(screen.queryByRole('link', { name: /^home$/i })).not.toBeInTheDocument();
@@ -44,14 +43,17 @@ describe('Header Component', () => {
     it('should not render duplicate category header strip', () => {
       render(<Header />);
       expect(
-        screen.queryByRole('navigation', { name: /category filter/i })
+        screen.queryByRole('navigation', { name: /category filter/i }),
       ).not.toBeInTheDocument();
     });
 
     it('should render navigation menu items in mobile menu', () => {
       render(<Header />);
-      const mobileNav = screen.getByRole('navigation', { name: /mobile navigation/i, hidden: true });
-      
+      const mobileNav = screen.getByRole('navigation', {
+        name: /mobile navigation/i,
+        hidden: true,
+      });
+
       expect(mobileNav).toHaveTextContent(/events/i);
       expect(mobileNav).toHaveTextContent(/categories/i);
     });
@@ -159,7 +161,7 @@ describe('Header Component', () => {
 
       expect(categoryButtons).toHaveLength(5);
       categoryButtons.forEach((button) => {
-        expect(button.textContent).not.toMatch(/[🎵⚽🎉🍽️🎨]/u);
+        expect(button.textContent).not.toMatch(/🎵|⚽|🎉|🍽️|🎨/u);
       });
     });
 
@@ -190,7 +192,10 @@ describe('Header Component', () => {
       await user.click(hamburger);
       expect(hamburger).toHaveAttribute('aria-expanded', 'true');
 
-      const mobileNav = screen.getByRole('navigation', { name: /mobile navigation/i, hidden: true });
+      const mobileNav = screen.getByRole('navigation', {
+        name: /mobile navigation/i,
+        hidden: true,
+      });
       const firstLink = mobileNav.querySelector('a');
 
       if (firstLink) {

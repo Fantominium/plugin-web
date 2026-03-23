@@ -1,4 +1,5 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import type React from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 interface DateRangeFilterProps {
   onChange: (dates: { startDate: Date | null; endDate: Date | null }) => void;
@@ -19,10 +20,10 @@ export default function DateRangeFilter({
   showPresets = false,
 }: DateRangeFilterProps) {
   const [startDate, setStartDate] = useState<string>(
-    initialStartDate ? initialStartDate.toISOString().split('T')[0] : ''
+    initialStartDate ? initialStartDate.toISOString().split('T')[0] : '',
   );
   const [endDate, setEndDate] = useState<string>(
-    initialEndDate ? initialEndDate.toISOString().split('T')[0] : ''
+    initialEndDate ? initialEndDate.toISOString().split('T')[0] : '',
   );
   const [error, setError] = useState<string>('');
 
@@ -80,7 +81,7 @@ export default function DateRangeFilter({
         endDate: endDateObj,
       });
     },
-    [onChange]
+    [onChange],
   );
 
   const handleStartDateChange = useCallback(
@@ -89,7 +90,7 @@ export default function DateRangeFilter({
       setStartDate(newStart);
       validateAndUpdate(newStart, endDate);
     },
-    [endDate, validateAndUpdate]
+    [endDate, validateAndUpdate],
   );
 
   const handleEndDateChange = useCallback(
@@ -98,7 +99,7 @@ export default function DateRangeFilter({
       setEndDate(newEnd);
       validateAndUpdate(startDate, newEnd);
     },
-    [startDate, validateAndUpdate]
+    [startDate, validateAndUpdate],
   );
 
   const handlePresetClick = useCallback(
@@ -110,7 +111,7 @@ export default function DateRangeFilter({
       setEndDate(endStr);
       validateAndUpdate(startStr, endStr);
     },
-    [validateAndUpdate]
+    [validateAndUpdate],
   );
 
   const handleClear = useCallback(() => {
@@ -158,8 +159,9 @@ export default function DateRangeFilter({
 
           {showPresets && (
             <div className="grid grid-cols-1 gap-2 pt-2">
-              {presets.map(preset => (
+              {presets.map((preset) => (
                 <button
+                  type="button"
                   key={preset.label}
                   onClick={() => handlePresetClick(preset)}
                   className="text-sm px-3 py-2 border border-gray-300 rounded hover:bg-gray-100 text-left"
@@ -174,6 +176,7 @@ export default function DateRangeFilter({
 
       {(startDate || endDate) && (
         <button
+          type="button"
           onClick={handleClear}
           className="mt-4 text-sm text-blue-600 hover:text-blue-800 font-medium"
           aria-label="Clear dates"

@@ -1,9 +1,8 @@
-import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
+import type { Event } from '@/app/types/event';
 import EventDetails from './EventDetails';
-import { Event } from '@/app/types/event';
 
 // Mock next/navigation
 jest.mock('next/navigation', () => ({
@@ -20,7 +19,8 @@ const mockEvent: Event = {
   location: 'Bridgetown Concert Hall, Bridgetown',
   startTime: '7:00 PM',
   ticketPrice: '$35.00',
-  description: 'Experience an unforgettable evening of live music featuring local and international artists.',
+  description:
+    'Experience an unforgettable evening of live music featuring local and international artists.',
   image: 'linear-gradient(135deg, #667eea, #764ba2)',
 };
 

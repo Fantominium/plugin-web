@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import styles from './SearchBar.module.css';
 
 export default function SearchBar() {
@@ -12,11 +11,7 @@ export default function SearchBar() {
         className={styles.searchInput}
         aria-label="Search events"
       />
-      <button
-        type="button"
-        className={styles.searchButton}
-        aria-label="Search"
-      >
+      <button type="button" className={styles.searchButton} aria-label="Search">
         <svg
           width="20"
           height="20"
@@ -24,7 +19,9 @@ export default function SearchBar() {
           fill="none"
           stroke="currentColor"
           strokeWidth="2"
+          aria-hidden="true"
         >
+          <title>Search</title>
           <circle cx="11" cy="11" r="8" />
           <path d="m21 21-4.35-4.35" />
         </svg>

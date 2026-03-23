@@ -16,7 +16,7 @@ body {
 }
 
 body::after {
-  content: '';
+  content: "";
   display: block;
   height: var(--category-tabs-height);
 }

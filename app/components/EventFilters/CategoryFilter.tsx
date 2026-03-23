@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
 interface CategoryFilterProps {
   categories: string[];
@@ -15,9 +15,7 @@ export default function CategoryFilter({
   showCount = false,
   categoryCount = {},
 }: CategoryFilterProps) {
-  const [selected, setSelected] = useState<Set<string>>(
-    new Set(selectedCategories)
-  );
+  const [selected, setSelected] = useState<Set<string>>(new Set(selectedCategories));
 
   const handleToggle = useCallback(
     (category: string) => {
@@ -30,7 +28,7 @@ export default function CategoryFilter({
       setSelected(newSelected);
       onChange(Array.from(newSelected));
     },
-    [selected, onChange]
+    [selected, onChange],
   );
 
   const handleClearAll = useCallback(() => {
@@ -43,7 +41,7 @@ export default function CategoryFilter({
       <fieldset>
         <legend className="text-lg font-semibold mb-4">Categories</legend>
         <div className="space-y-2">
-          {categories.map(category => (
+          {categories.map((category) => (
             <div key={category} className="flex items-center">
               <input
                 type="checkbox"
@@ -55,9 +53,7 @@ export default function CategoryFilter({
               <label htmlFor={`cat-${category}`} className="ml-2 cursor-pointer flex-1">
                 {category}
                 {showCount && categoryCount[category] && (
-                  <span className="ml-2 text-sm text-gray-500">
-                    ({categoryCount[category]})
-                  </span>
+                  <span className="ml-2 text-sm text-gray-500">({categoryCount[category]})</span>
                 )}
               </label>
             </div>
@@ -67,6 +63,7 @@ export default function CategoryFilter({
 
       {selected.size > 0 && (
         <button
+          type="button"
           onClick={handleClearAll}
           className="mt-4 text-sm text-blue-600 hover:text-blue-800 font-medium"
           aria-label="Clear all category filters"

@@ -1,4 +1,3 @@
-import React from 'react';
 import EventDetails from '@/app/components/EventDetails/EventDetails';
 import { fetchEventById } from '@/app/lib/event-service';
 

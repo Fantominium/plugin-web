@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useCallback, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Event } from '@/app/types/event';
+import { useCallback, useEffect, useRef } from 'react';
+import type { Event } from '@/app/types/event';
 import styles from './EventDetails.module.css';
 
 interface EventDetailsProps {
@@ -39,17 +39,14 @@ export default function EventDetails({ event }: EventDetailsProps) {
     };
   }, []);
 
-  const handleBackdropClick = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
-      if (e.target === e.currentTarget) {
-        handleClose();
-      }
-    },
-    [handleClose]
-  );
-
   return (
-    <div className={styles.backdrop} onClick={handleBackdropClick}>
+    <div className={styles.backdrop}>
+      <button
+        type="button"
+        className={styles.backdropDismiss}
+        onClick={handleClose}
+        aria-label="Dismiss event details overlay"
+      />
       <div
         ref={dialogRef}
         className={styles.modal}
@@ -59,6 +56,7 @@ export default function EventDetails({ event }: EventDetailsProps) {
       >
         {/* Close Button */}
         <button
+          type="button"
           className={styles.closeButton}
           onClick={handleClose}
           aria-label="Close event details"
@@ -140,7 +138,7 @@ export default function EventDetails({ event }: EventDetailsProps) {
           )}
 
           {/* Action Button */}
-          <button className={styles.actionButton} aria-label="Register for event">
+          <button type="button" className={styles.actionButton} aria-label="Register for event">
             Register Now
           </button>
         </div>
