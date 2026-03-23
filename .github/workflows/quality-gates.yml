@@ -1,0 +1,126 @@
+name: quality-gates
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  quality-gates:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run repository quality gates
+        run: npm run gates:ci
+
+  postgres-migration-validation:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: app_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres -d app_test"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    env:
+      PGHOST: localhost
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: app_test
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/app_test
+      MIGRATION_VALIDATE_COMMAND: ""
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install PostgreSQL client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
+      - name: Validate PostgreSQL migrations
+        run: npm run gates:postgres
+
+  container-security:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Detect Dockerfile
+        id: detect_dockerfile
+        run: |
+          if [ -f Dockerfile ]; then
+            echo "dockerfile_exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "dockerfile_exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build runtime image
+        if: steps.detect_dockerfile.outputs.dockerfile_exists == 'true'
+        run: docker build -t plugin-web:ci .
+
+      - name: Trivy image scan
+        if: steps.detect_dockerfile.outputs.dockerfile_exists == 'true'
+        run: |
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            aquasec/trivy:0.51.2 image --exit-code 1 --severity CRITICAL,HIGH plugin-web:ci
+
+      - name: Skip container scan
+        if: steps.detect_dockerfile.outputs.dockerfile_exists != 'true'
+        run: echo "No Dockerfile detected; container-security gate is N/A"
+
+  sonarqube:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate coverage
+        run: npm run test:ci
+
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v2.3.0
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}

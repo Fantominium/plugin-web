@@ -1,11 +1,11 @@
+import type { Event } from '@/app/types/event';
 import {
-  searchEvents,
+  clearSearchHistory,
+  getSearchHistory,
   getSearchSuggestions,
   saveSearchToHistory,
-  getSearchHistory,
-  clearSearchHistory,
+  searchEvents,
 } from '../search-service';
-import { Event } from '@/app/types/event';
 
 global.fetch = jest.fn();
 
@@ -40,8 +40,8 @@ describe('Search Service', () => {
   describe('searchEvents', () => {
     it('should search events with keyword', async () => {
       const mockResults: Event[] = [
-        { id: 1, title: 'Concert Night', category: 'Concerts' },
-        { id: 2, title: 'Concert Series', category: 'Concerts' },
+        { id: 1, title: 'Concert Night', date: 'Feb 15, 2026', category: 'Concerts' },
+        { id: 2, title: 'Concert Series', date: 'Feb 16, 2026', category: 'Concerts' },
       ];
 
       (global.fetch as jest.Mock).mockResolvedValueOnce({
@@ -52,9 +52,7 @@ describe('Search Service', () => {
       const result = await searchEvents('Concert');
 
       expect(result).toEqual(mockResults);
-      expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringMatching(/search.*concert/)
-      );
+      expect(global.fetch).toHaveBeenCalledWith(expect.stringMatching(/search.*concert/));
     });
 
     it('should return empty array for no matches', async () => {
@@ -70,7 +68,7 @@ describe('Search Service', () => {
 
     it('should respect filters in search', async () => {
       const mockResults: Event[] = [
-        { id: 1, title: 'Concert', category: 'Concerts' },
+        { id: 1, title: 'Concert', date: 'Feb 15, 2026', category: 'Concerts' },
       ];
 
       (global.fetch as jest.Mock).mockResolvedValueOnce({
@@ -92,7 +90,7 @@ describe('Search Service', () => {
     it('should be case-insensitive', async () => {
       (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
-        json: async () => [{ id: 1, title: 'Concert' }],
+        json: async () => [{ id: 1, title: 'Concert', date: 'Feb 15, 2026', category: 'Concerts' }],
       });
 
       await searchEvents('CONCERT');
@@ -123,7 +121,7 @@ describe('Search Service', () => {
       searchEvents('concert');
 
       // Debounced function should only call fetch once after delay
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise((resolve) => setTimeout(resolve, 300));
 
       expect(global.fetch).toHaveBeenCalledTimes(1);
     });
@@ -131,11 +129,7 @@ describe('Search Service', () => {
 
   describe('getSearchSuggestions', () => {
     it('should return event suggestions for partial keyword', async () => {
-      const mockSuggestions = [
-        'Concert Night',
-        'Concert Series',
-        'Concert Festival',
-      ];
+      const mockSuggestions = ['Concert Night', 'Concert Series', 'Concert Festival'];
 
       (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
@@ -150,10 +144,7 @@ describe('Search Service', () => {
 
     it('should include recent searches in suggestions', async () => {
       // Add some items to search history
-      localStorage.setItem(
-        'searchHistory',
-        JSON.stringify(['Concert', 'Sports Event'])
-      );
+      localStorage.setItem('searchHistory', JSON.stringify(['Concert', 'Sports Event']));
 
       (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
@@ -166,10 +157,7 @@ describe('Search Service', () => {
     });
 
     it('should return suggestions for venues', async () => {
-      const mockSuggestions = [
-        'Bridgetown Concert Hall',
-        'National Stadium',
-      ];
+      const mockSuggestions = ['Bridgetown Concert Hall', 'National Stadium'];
 
       (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
@@ -212,9 +200,7 @@ describe('Search Service', () => {
       saveSearchToHistory('Concert');
 
       const history = JSON.parse(localStorage.getItem('searchHistory') || '[]');
-      const concertCount = history.filter(
-        (item: string) => item === 'Concert'
-      ).length;
+      const concertCount = history.filter((item: string) => item === 'Concert').length;
       expect(concertCount).toBe(1);
     });
 

@@ -1,3 +1,4 @@
+import type { Event } from '@/app/types/event';
 import {
   fetchEventById,
   fetchEventList,
@@ -6,7 +7,6 @@ import {
   fetchEventsByLocation,
   fetchEventsByMultipleFilters,
 } from '../event-service';
-import { Event } from '@/app/types/event';
 
 // Mock fetch
 global.fetch = jest.fn();
@@ -103,9 +103,7 @@ describe('Event Service', () => {
 
       expect(result.page).toBe(2);
       expect(result.total).toBe(50);
-      expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining('page=2')
-      );
+      expect(global.fetch).toHaveBeenCalledWith(expect.stringContaining('page=2'));
     });
 
     it('should return empty array when no events found', async () => {
@@ -132,17 +130,15 @@ describe('Event Service', () => {
 
       await fetchEventList({ category: 'Concerts' });
 
-      expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining('category=Concerts')
-      );
+      expect(global.fetch).toHaveBeenCalledWith(expect.stringContaining('category=Concerts'));
     });
   });
 
   describe('fetchEventsByCategory', () => {
     it('should fetch events by category', async () => {
       const mockEvents: Event[] = [
-        { id: 1, title: 'Concert 1', category: 'Concerts' },
-        { id: 2, title: 'Concert 2', category: 'Concerts' },
+        { id: 1, title: 'Concert 1', date: 'Feb 15, 2026', category: 'Concerts' },
+        { id: 2, title: 'Concert 2', date: 'Feb 16, 2026', category: 'Concerts' },
       ];
 
       (global.fetch as jest.Mock).mockResolvedValueOnce({
@@ -171,7 +167,7 @@ describe('Event Service', () => {
   describe('fetchEventsByDateRange', () => {
     it('should fetch events within date range', async () => {
       const mockEvents: Event[] = [
-        { id: 1, title: 'Event 1', date: 'Feb 15, 2026' },
+        { id: 1, title: 'Event 1', date: 'Feb 15, 2026', category: 'General' },
       ];
 
       (global.fetch as jest.Mock).mockResolvedValueOnce({
@@ -185,16 +181,20 @@ describe('Event Service', () => {
       const result = await fetchEventsByDateRange(startDate, endDate);
 
       expect(result).toEqual(mockEvents);
-      expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringMatching(/startDate=.*&endDate=/)
-      );
+      expect(global.fetch).toHaveBeenCalledWith(expect.stringMatching(/startDate=.*&endDate=/));
     });
   });
 
   describe('fetchEventsByLocation', () => {
     it('should fetch events by location', async () => {
       const mockEvents: Event[] = [
-        { id: 1, title: 'Event 1', location: 'Bridgetown Concert Hall' },
+        {
+          id: 1,
+          title: 'Event 1',
+          date: 'Feb 15, 2026',
+          category: 'General',
+          location: 'Bridgetown Concert Hall',
+        },
       ];
 
       (global.fetch as jest.Mock).mockResolvedValueOnce({
@@ -209,7 +209,13 @@ describe('Event Service', () => {
 
     it('should fetch events within radius from coordinates', async () => {
       const mockEvents: Event[] = [
-        { id: 1, title: 'Event 1', location: 'Near you' },
+        {
+          id: 1,
+          title: 'Event 1',
+          date: 'Feb 15, 2026',
+          category: 'General',
+          location: 'Near you',
+        },
       ];
 
       (global.fetch as jest.Mock).mockResolvedValueOnce({
@@ -225,7 +231,7 @@ describe('Event Service', () => {
 
       expect(result).toEqual(mockEvents);
       expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringMatching(/latitude=|longitude=|radius=/)
+        expect.stringMatching(/latitude=|longitude=|radius=/),
       );
     });
   });
@@ -255,9 +261,7 @@ describe('Event Service', () => {
       });
 
       expect(result.data).toEqual(mockEvents);
-      expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringMatching(/category=Concerts/)
-      );
+      expect(global.fetch).toHaveBeenCalledWith(expect.stringMatching(/category=Concerts/));
     });
 
     it('should combine all filter types in single request', async () => {

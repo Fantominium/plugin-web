@@ -7,10 +7,20 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "test:ci": "jest --ci --coverage --runInBand",
+    "gates:e2e": "bash ./scripts/quality-gates/validate-e2e.sh",
+    "gates:a11y": "bash ./scripts/quality-gates/validate-accessibility.sh",
+    "gates:contracts": "bash ./scripts/quality-gates/validate-contracts.sh",
+    "gates:precommit": "bash ./scripts/quality-gates/pre-commit.sh",
+    "gates:prepush": "bash ./scripts/quality-gates/pre-push.sh",
+    "gates:ci": "bash ./scripts/quality-gates/ci.sh",
+    "gates:postgres": "bash ./scripts/quality-gates/validate-postgres-migrations.sh",
+    "hooks:install": "git config core.hooksPath .githooks"
   },
   "dependencies": {
     "@types/testing-library__react": "^10.2.0",

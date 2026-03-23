@@ -3,7 +3,7 @@
  * Handles searching, filtering, and managing search history
  */
 
-import { Event } from '@/app/types/event';
+import type { Event } from '@/app/types/event';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
 const SEARCH_HISTORY_KEY = 'searchHistory';
@@ -12,13 +12,13 @@ const SEARCH_HISTORY_LIMIT = 10;
 // Debounce helper
 let debounceTimer: NodeJS.Timeout;
 
-function debounce<T extends (...args: any[]) => Promise<any>>(
-  func: T,
-  delay: number
-): (...args: Parameters<T>) => Promise<Awaited<ReturnType<T>>> {
-  return async (...args: Parameters<T>) => {
+function debounce<TArgs extends unknown[], TResult>(
+  func: (...args: TArgs) => Promise<TResult>,
+  delay: number,
+): (...args: TArgs) => Promise<TResult> {
+  return async (...args: TArgs) => {
     clearTimeout(debounceTimer);
-    return new Promise((resolve) => {
+    return new Promise<TResult>((resolve) => {
       debounceTimer = setTimeout(async () => {
         resolve(await func(...args));
       }, delay);
@@ -38,7 +38,7 @@ export const searchEvents = debounce(
       location?: string;
       minPrice?: number;
       maxPrice?: number;
-    }
+    },
   ): Promise<Event[]> => {
     try {
       const params = new URLSearchParams({ q: keyword.toLowerCase() });
@@ -57,43 +57,37 @@ export const searchEvents = debounce(
       return [];
     }
   },
-  250
+  250,
 ); // Debounce by 250ms
 
 /**
  * Get search suggestions based on partial keyword
  * Includes recent searches and venue suggestions
  */
-export async function getSearchSuggestions(
-  keyword: string
-): Promise<string[]> {
+export async function getSearchSuggestions(keyword: string): Promise<string[]> {
   if (!keyword.trim()) {
     return [];
   }
 
   try {
     const params = new URLSearchParams({ q: keyword.toLowerCase() });
-    const response = await fetch(
-      `${API_URL}/events/suggestions?${params.toString()}`
-    );
-    
+    const response = await fetch(`${API_URL}/events/suggestions?${params.toString()}`);
+
     if (!response.ok) throw new Error('Failed to fetch suggestions');
     const suggestions = await response.json();
 
     // Merge API suggestions with recent searches
-    const recentSearches = getSearchHistory().filter(item =>
-      item.toLowerCase().includes(keyword.toLowerCase())
+    const recentSearches = getSearchHistory().filter((item) =>
+      item.toLowerCase().includes(keyword.toLowerCase()),
     );
 
-    const allSuggestions = [
-      ...new Set([...recentSearches, ...(suggestions || [])]),
-    ];
+    const allSuggestions = [...new Set([...recentSearches, ...(suggestions || [])])];
 
     return allSuggestions.slice(0, 10);
-  } catch (error) {
+  } catch {
     // Fallback to recent searches only
     return getSearchHistory()
-      .filter(item => item.toLowerCase().includes(keyword.toLowerCase()))
+      .filter((item) => item.toLowerCase().includes(keyword.toLowerCase()))
       .slice(0, 10);
   }
 }
@@ -115,7 +109,7 @@ export function saveSearchToHistory(searchTerm: string): void {
   }
 
   // Remove duplicate if it exists
-  history = history.filter(item => item !== trimmed);
+  history = history.filter((item) => item !== trimmed);
 
   // Add to beginning (most recent)
   history.unshift(trimmed);

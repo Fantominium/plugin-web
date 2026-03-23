@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Plugin Web
+
+Plugin Web is a Next.js application for event discovery and related product workflows. This repository also includes a Spec Kit driven planning workflow backed by an enforceable engineering constitution, quality gates, and reviewer commands.
 
 ## Getting Started
 
-First, run the development server:
+Run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000` in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Quality Gates
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Install local hooks once per clone:
 
-## Learn More
+```bash
+npm run hooks:install
+```
 
-To learn more about Next.js, take a look at the following resources:
+Additional gate activation details live in `QUALITY_GATES.md`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Spec Kit Workflow
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The repository uses Spec Kit commands for specification, clarification, planning, and task generation.
 
-## Deploy on Vercel
+Core authoring flow:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. `/speckit.specify` to create or update the feature specification
+2. `/speckit.clarify` to resolve high-impact ambiguities in the active spec
+3. `/speckit.plan` to build the implementation plan
+4. `/speckit.tasks` to generate dependency-ordered implementation tasks
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Reviewer Commands
+
+Before planning, reviewers can use the following commands:
+
+1. `/speckit.spec-readiness`
+   Returns a read-only `READY` or `BLOCKED` verdict for the active spec against the constitution, specification gates, and required validation evidence.
+2. `/speckit.spec-readiness-checklist`
+   Creates or updates `checklists/spec-readiness.md` for reviewer use before `/speckit.plan`.
+
+## Automatic Readiness Hooks
+
+Spec readiness checks are also injected automatically through `.specify/extensions.yml`:
+
+1. Before `/speckit.plan`
+2. Before `/speckit.tasks`
+
+Those hooks invoke `/speckit.spec-readiness` as a mandatory pre-check so planning and task generation do not proceed on an incomplete spec.
+
+## Governance Files
+
+The spec workflow is governed by:
+
+1. `.specify/memory/constitution.md`
+2. `.specify/memory/gate-checklist-matrix.md`
+3. `.specify/memory/automation-policy.md`
+
+## Stack
+
+1. Next.js
+2. React
+3. TypeScript
+4. Jest
+5. ESLint
+6. Biome

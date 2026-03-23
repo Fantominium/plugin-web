@@ -1,0 +1,15 @@
+hooks:
+  before_plan:
+    - extension: constitution-spec-readiness
+      enabled: true
+      optional: false
+      command: speckit.spec-readiness
+      description: Review the active specification against the constitution before planning.
+      prompt: Confirm the spec is ready for planning and identify any blocking gate failures.
+  before_tasks:
+    - extension: constitution-spec-readiness
+      enabled: true
+      optional: false
+      command: speckit.spec-readiness
+      description: Re-check specification readiness before task generation.
+      prompt: Re-validate the specification gates and evidence before tasks are generated.

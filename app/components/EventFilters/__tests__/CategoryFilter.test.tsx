@@ -1,17 +1,9 @@
-import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import CategoryFilter from '../CategoryFilter';
 
 describe('CategoryFilter Component', () => {
-  const mockCategories = [
-    'Concerts',
-    'Sports',
-    'Art',
-    'Food',
-    'Theater',
-    'Comedy',
-  ];
+  const mockCategories = ['Concerts', 'Sports', 'Art', 'Food', 'Theater', 'Comedy'];
 
   const mockOnChange = jest.fn();
 
@@ -20,19 +12,15 @@ describe('CategoryFilter Component', () => {
   });
 
   it('should render all categories', () => {
-    render(
-      <CategoryFilter categories={mockCategories} onChange={mockOnChange} />
-    );
+    render(<CategoryFilter categories={mockCategories} onChange={mockOnChange} />);
 
-    mockCategories.forEach(cat => {
+    mockCategories.forEach((cat) => {
       expect(screen.getByLabelText(cat)).toBeInTheDocument();
     });
   });
 
   it('should render with accessibility labels', () => {
-    render(
-      <CategoryFilter categories={mockCategories} onChange={mockOnChange} />
-    );
+    render(<CategoryFilter categories={mockCategories} onChange={mockOnChange} />);
 
     const fieldset = screen.getByRole('group');
     expect(fieldset).toBeInTheDocument();
@@ -40,9 +28,7 @@ describe('CategoryFilter Component', () => {
 
   it('should call onChange when category is selected', async () => {
     const user = userEvent.setup();
-    render(
-      <CategoryFilter categories={mockCategories} onChange={mockOnChange} />
-    );
+    render(<CategoryFilter categories={mockCategories} onChange={mockOnChange} />);
 
     const concertCheckbox = screen.getByLabelText('Concerts');
     await user.click(concertCheckbox);
@@ -52,9 +38,7 @@ describe('CategoryFilter Component', () => {
 
   it('should handle multiple selections', async () => {
     const user = userEvent.setup();
-    render(
-      <CategoryFilter categories={mockCategories} onChange={mockOnChange} />
-    );
+    render(<CategoryFilter categories={mockCategories} onChange={mockOnChange} />);
 
     const concertCheckbox = screen.getByLabelText('Concerts');
     const sportsCheckbox = screen.getByLabelText('Sports');
@@ -72,7 +56,7 @@ describe('CategoryFilter Component', () => {
         categories={mockCategories}
         onChange={mockOnChange}
         selectedCategories={['Concerts']}
-      />
+      />,
     );
 
     const concertCheckbox = screen.getByLabelText('Concerts');
@@ -88,7 +72,7 @@ describe('CategoryFilter Component', () => {
         onChange={mockOnChange}
         showCount={true}
         categoryCount={{ Concerts: 15, Sports: 23, Art: 8, Food: 42, Theater: 5, Comedy: 10 }}
-      />
+      />,
     );
 
     expect(screen.getByText(/Concerts/)).toBeInTheDocument();
@@ -97,13 +81,12 @@ describe('CategoryFilter Component', () => {
 
   it('should allow clearing all selections', async () => {
     const user = userEvent.setup();
-    const { rerender } = render(
+    render(
       <CategoryFilter
         categories={mockCategories}
         onChange={mockOnChange}
         selectedCategories={['Concerts', 'Sports']}
-        onClear={jest.fn()}
-      />
+      />,
     );
 
     const clearButton = screen.getByRole('button', { name: /clear/i });

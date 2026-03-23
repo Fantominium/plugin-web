@@ -3,7 +3,7 @@
  * Handles user login, signup, token management, and session validation
  */
 
-import { User, LoginCredentials, SignupData, AuthResponse, TokenRefreshResponse } from '@/app/types/user';
+import type { AuthResponse, SignupData, TokenRefreshResponse, User } from '@/app/types/user';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
 const AUTH_TOKEN_KEY = 'authToken';
@@ -28,10 +28,7 @@ function isPasswordStrong(password: string): boolean {
 /**
  * Login user with email and password
  */
-export async function login(
-  email: string,
-  password: string
-): Promise<AuthResponse> {
+export async function login(email: string, password: string): Promise<AuthResponse> {
   try {
     // Client-side validation
     if (!isValidEmail(email)) {
@@ -91,9 +88,7 @@ export async function login(
 /**
  * Sign up new user
  */
-export async function signup(
-  credentials: SignupData
-): Promise<AuthResponse> {
+export async function signup(credentials: SignupData): Promise<AuthResponse> {
   try {
     // Client-side validation
     if (!isValidEmail(credentials.email)) {

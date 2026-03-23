@@ -1,14 +1,14 @@
+import type { User } from '@/app/types/user';
 import {
+  getCurrentUser,
+  getStoredToken,
+  isAuthenticatedAsync,
   login,
-  signup,
   logout,
   refreshToken,
-  getCurrentUser,
-  isAuthenticatedAsync,
+  signup,
   validateToken,
-  getStoredToken,
 } from '../auth-service';
-import { User } from '@/app/types/user';
 
 global.fetch = jest.fn();
 
@@ -61,10 +61,15 @@ describe('Authentication Service', () => {
       });
 
       const result = await login('user@example.com', 'password123');
+      const data = result.data;
 
       expect(result.success).toBe(true);
-      expect(result.data.user.email).toBe('user@example.com');
-      expect(result.data.token).toBeDefined();
+      expect(data).toBeDefined();
+      if (!data) {
+        throw new Error('Expected login result to include data');
+      }
+      expect(data.user.email).toBe('user@example.com');
+      expect(data.token).toBeDefined();
     });
 
     it('should store token in localStorage on successful login', async () => {
@@ -105,9 +110,7 @@ describe('Authentication Service', () => {
     });
 
     it('should handle network errors', async () => {
-      (global.fetch as jest.Mock).mockRejectedValueOnce(
-        new Error('Network error')
-      );
+      (global.fetch as jest.Mock).mockRejectedValueOnce(new Error('Network error'));
 
       const result = await login('user@example.com', 'password123');
 
@@ -155,9 +158,14 @@ describe('Authentication Service', () => {
         password: 'password123',
         name: 'Jane Doe',
       });
+      const data = result.data;
 
       expect(result.success).toBe(true);
-      expect(result.data.user.email).toBe('newuser@example.com');
+      expect(data).toBeDefined();
+      if (!data) {
+        throw new Error('Expected signup result to include data');
+      }
+      expect(data.user.email).toBe('newuser@example.com');
     });
 
     it('should store token after signup', async () => {
@@ -276,9 +284,14 @@ describe('Authentication Service', () => {
       });
 
       const result = await refreshToken();
+      const data = result.data;
 
       expect(result.success).toBe(true);
-      expect(result.data.token).toBe('new-access-token');
+      expect(data).toBeDefined();
+      if (!data) {
+        throw new Error('Expected refresh token result to include data');
+      }
+      expect(data.token).toBe('new-access-token');
       expect(localStorage.getItem('authToken')).toBe('new-access-token');
     });
 

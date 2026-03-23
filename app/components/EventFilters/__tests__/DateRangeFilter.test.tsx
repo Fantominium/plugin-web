@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import DateRangeFilter from '../DateRangeFilter';
@@ -21,7 +20,7 @@ describe('DateRangeFilter Component', () => {
     const user = userEvent.setup();
     render(<DateRangeFilter onChange={mockOnChange} />);
 
-    const startInput = screen.getByLabelText(/start date/i) as HTMLInputElement;
+    const startInput = screen.getByLabelText(/start date/i);
     await user.type(startInput, '2026-02-15');
 
     await waitFor(() => {
@@ -33,7 +32,7 @@ describe('DateRangeFilter Component', () => {
     const user = userEvent.setup();
     render(<DateRangeFilter onChange={mockOnChange} />);
 
-    const endInput = screen.getByLabelText(/end date/i) as HTMLInputElement;
+    const endInput = screen.getByLabelText(/end date/i);
     await user.type(endInput, '2026-03-15');
 
     await waitFor(() => {
@@ -43,10 +42,10 @@ describe('DateRangeFilter Component', () => {
 
   it('should validate that end date is after start date', async () => {
     const user = userEvent.setup();
-    const { rerender } = render(<DateRangeFilter onChange={mockOnChange} />);
+    render(<DateRangeFilter onChange={mockOnChange} />);
 
-    const startInput = screen.getByLabelText(/start date/i) as HTMLInputElement;
-    const endInput = screen.getByLabelText(/end date/i) as HTMLInputElement;
+    const startInput = screen.getByLabelText(/start date/i);
+    const endInput = screen.getByLabelText(/end date/i);
 
     await user.type(startInput, '2026-03-15');
     await user.type(endInput, '2026-02-15');
@@ -83,7 +82,7 @@ describe('DateRangeFilter Component', () => {
         onChange={mockOnChange}
         startDate={new Date('2026-02-15')}
         endDate={new Date('2026-03-15')}
-      />
+      />,
     );
 
     const clearButton = screen.getByRole('button', { name: /clear dates/i });
