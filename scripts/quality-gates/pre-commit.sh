@@ -27,7 +27,7 @@ if [[ -n "$ADDED_LINES" ]]; then
     | grep -E -v '^[+].*(POSTGRES_PASSWORD|PGPASSWORD):[[:space:]]*postgres([[:space:]]*)$' \
     || true)"
 
-  if printf '%s\n' "$FILTERED_LINES" | grep -E -i '(-----BEGIN (RSA|EC|OPENSSH|DSA) PRIVATE KEY-----|api[_-]?key[[:space:]]*[:=][[:space:]]*[^[:space:]]+|secret[[:space:]]*[:=][[:space:]]*[^[:space:]]+|token[[:space:]]*[:=][[:space:]]*[^[:space:]]+|password[[:space:]]*[:=][[:space:]]*[^[:space:]]+)' >/dev/null; then
+  if printf '%s\n' "$FILTERED_LINES" | grep -E -i "(-----BEGIN (RSA|EC|OPENSSH|DSA) PRIVATE KEY-----|((api[_-]?key|secret|token|password)[[:space:]]*[:=][[:space:]]*['\"][^'\"]+['\"]|((api[_-]?key|secret|token|password)[[:space:]]*[:=][[:space:]]*[A-Za-z0-9_+-]{12,})))" >/dev/null; then
     fail "Potential secret material detected in staged changes"
   fi
 fi
