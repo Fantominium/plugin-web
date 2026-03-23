@@ -41,10 +41,17 @@ run_cmd npm run lint
 run_cmd npm run typecheck
 
 JS_TS_STAGED=()
+BIOME_STAGED=()
 for file in "${STAGED_FILES[@]}"; do
   case "$file" in
     *.js|*.jsx|*.ts|*.tsx)
       JS_TS_STAGED+=("$file")
+      ;;
+  esac
+
+  case "$file" in
+    *.js|*.jsx|*.cjs|*.mjs|*.ts|*.tsx|*.cts|*.mts|*.json|*.jsonc|*.css)
+      BIOME_STAGED+=("$file")
       ;;
   esac
 done
@@ -54,8 +61,12 @@ if [[ ${#JS_TS_STAGED[@]} -gt 0 ]]; then
 fi
 
 if [[ -f "$REPO_ROOT/biome.json" ]]; then
-  info "Running Biome staged-file check"
-  npx --yes @biomejs/biome check "${STAGED_FILES[@]}" || fail "Biome check failed"
+  if [[ ${#BIOME_STAGED[@]} -gt 0 ]]; then
+    info "Running Biome staged-file check"
+    npx --yes @biomejs/biome check "${BIOME_STAGED[@]}" || fail "Biome check failed"
+  else
+    info "No Biome-supported staged files detected; skipping Biome staged-file check"
+  fi
 fi
 
 info "Pre-commit quality gates passed"
