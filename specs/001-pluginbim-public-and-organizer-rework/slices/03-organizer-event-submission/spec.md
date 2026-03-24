@@ -14,10 +14,11 @@ Included:
 - Protected upload page with three required sections
 - Create-event form fields and validation
 - Poster upload behavior
-- Location selection
+- Location selection from the repository-managed controlled dataset
 - Pricing capture on create
 - Pending-approval persistence and organizer association
 - Submission notification trigger behavior
+- Non-blocking notification-failure warning behavior after successful persistence
 
 Excluded:
 - Organizer update workflow
@@ -31,10 +32,14 @@ User stories:
 
 Functional requirements:
 - `FR-013` through `FR-020`
+- `FR-017A`
 - `FR-025`
 - `FR-026`
 - `FR-027`
+- `FR-027A`
+- `FR-027B`
 - `FR-029`
+- `FR-035A`
 
 Key entities:
 - `EventFormSubmission`
@@ -54,7 +59,9 @@ This slice is functionally complete when:
 - the protected upload page exists with the exact required section structure
 - valid submissions create pending-approval records
 - invalid input, invalid URLs, invalid files, and invalid dates are rejected correctly
-- submission notifications are triggered through the approved workflow
+- location options come from the approved repository-managed controlled dataset
+- submission notifications are triggered through the approved workflow abstraction
+- successful event creation is not rolled back when notification delivery fails, and the organizer receives a recoverable warning
 
 ## Required Quality Gates
 
@@ -78,7 +85,7 @@ Slice-specific:
 ## Required Evidence
 
 - Unit tests for validation, transformation, pricing rules, and file checks
-- Integration tests for create-event, upload, persistence, and dashboard reflection
+- Integration tests for create-event, upload, PostgreSQL-backed persistence, notification success and warning paths, and dashboard reflection
 - End-to-end tests for the organizer submission journey
 - Authorization evidence confirming only allowed organizers can submit
 - Network-security evidence for upload and protected mutation behavior
@@ -95,6 +102,7 @@ Slice-specific:
 
 Hard dependencies:
 - Slice 02
+- Slice 08
 - Slice 07 where missing gate tooling would block completeness
 
 Enables:

@@ -14,6 +14,7 @@ Included:
 - E2E tooling enablement
 - Accessibility tooling enablement
 - Contract-validation artifact and command enablement
+- Industry-standard contract versioning rules reflected in artifacts and validation
 - Migration-validation enablement when schema work exists
 - Production build evidence path
 - Performance evidence recording path
@@ -30,6 +31,7 @@ Parent sections:
 
 Functional requirements:
 - `FR-045`
+- `FR-034B`
 
 Also covers:
 - `Contract Tooling Enablement Requirement`
@@ -44,6 +46,7 @@ The repo can produce non-placeholder evidence for the required build, E2E, acces
 This slice is functionally complete when:
 - required quality-gate tooling is executable in the repo
 - contract validation uses versioned OpenAPI or Swagger artifacts plus a runnable validation command
+- contract versioning guidance distinguishes additive backward-compatible changes from breaking major-version changes
 - migration validation can run meaningfully when schema changes are present
 - production build evidence is available in CI
 - performance evidence can be recorded in an agreed repeatable way
@@ -70,6 +73,7 @@ Slice-specific:
 - CI evidence that E2E validation is executable and non-placeholder
 - CI evidence that accessibility validation is executable and non-placeholder
 - CI evidence that contract validation is executable and non-placeholder
+- CI evidence that contract artifacts follow the agreed versioning strategy for additive versus breaking changes
 - CI evidence that migration validation is executable when required
 
 ## Expected Slice Artifacts
@@ -87,3 +91,4 @@ Hard dependencies:
 
 Enables:
 - Any slice whose completeness depends on currently missing evidence tooling
+- Slice 08 where containerized runtime delivery depends on reproducible build and validation paths

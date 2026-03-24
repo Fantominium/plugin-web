@@ -13,7 +13,9 @@ Establish secure MVP authentication, session handling, user-role assignment, pro
 Included:
 - Google login
 - Email magic-link login
+- Magic-link expiry and replay protection
 - Role assignment and role-aware landing behavior
+- Admin allowlist resolution for MVP
 - Organizer and admin protected route boundaries
 - Centralized server-side authorization foundation
 
@@ -30,10 +32,12 @@ User stories:
 
 Functional requirements:
 - `FR-005`
+- `FR-005A`
 - `FR-006`
 - `FR-007`
 - `FR-008`
 - `FR-008A`
+- `FR-008B`
 - `FR-036`
 - `FR-039`
 - `FR-040`
@@ -56,7 +60,9 @@ An organizer can sign in and reach the organizer dashboard, an admin can sign in
 
 This slice is functionally complete when:
 - MVP login supports Google and email magic link
+- email magic links expire after 15 minutes and cannot be replayed after first use
 - user roles are resolved consistently
+- admin access is granted only to approved allowlisted accounts
 - organizer and admin route access is server-side enforced
 - unauthorized, non-owner, and privilege-escalation paths are denied
 
@@ -82,6 +88,7 @@ Slice-specific:
 ## Required Evidence
 
 - Unit tests for auth helpers, role checks, token handling, and policy logic
+- Unit tests for allowlist-based admin resolution and invalid, expired, or replayed magic-link handling
 - Integration tests for login/session flow and post-login routing
 - End-to-end tests for organizer and admin sign-in journeys
 - Authorization tests for allow-path, deny-path, owner-scope, admin-scope, and escalation cases
@@ -99,6 +106,9 @@ Slice-specific:
 
 Hard dependencies:
 - Slice 07 for enforceable automation where missing tooling blocks required evidence
+
+Recommended dependencies:
+- Slice 08 when authentication persistence or migration validation is implemented against PostgreSQL
 
 Enables:
 - Slice 03

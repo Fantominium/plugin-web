@@ -25,12 +25,14 @@ Expected per-slice artifacts:
 5. [05-admin-panel-and-moderation/spec.md](/Users/malcolm/Desktop/projects/plugin/plugin-web/specs/001-pluginbim-public-and-organizer-rework/slices/05-admin-panel-and-moderation/spec.md)
 6. [06-public-published-event-visibility/spec.md](/Users/malcolm/Desktop/projects/plugin/plugin-web/specs/001-pluginbim-public-and-organizer-rework/slices/06-public-published-event-visibility/spec.md)
 7. [07-quality-gate-and-operational-enablement/spec.md](/Users/malcolm/Desktop/projects/plugin/plugin-web/specs/001-pluginbim-public-and-organizer-rework/slices/07-quality-gate-and-operational-enablement/spec.md)
+8. [08-containerization-and-postgresql-runtime-foundation/spec.md](/Users/malcolm/Desktop/projects/plugin/plugin-web/specs/001-pluginbim-public-and-organizer-rework/slices/08-containerization-and-postgresql-runtime-foundation/spec.md)
 
 ## Sequencing Model
 
 Foundational prerequisites:
 1. Slice 07 - Quality-Gate and Operational Enablement
-2. Slice 02 - Authentication and Role Foundation
+2. Slice 08 - Containerization and PostgreSQL Runtime Foundation
+3. Slice 02 - Authentication and Role Foundation
 
 User-visible milestones:
 1. Slice 01 - Public Experience Foundation
@@ -42,6 +44,7 @@ User-visible milestones:
 ## Dependency Rules
 
 - Slice 07 enables enforceable evidence for slices that rely on missing automation.
+- Slice 08 enables slices that rely on PostgreSQL-backed persistence or container-runtime parity.
 - Slice 02 is a prerequisite for slices 03, 04, and 05.
 - Slice 03 is a prerequisite for slice 05.
 - Slice 05 is a prerequisite for slice 06.

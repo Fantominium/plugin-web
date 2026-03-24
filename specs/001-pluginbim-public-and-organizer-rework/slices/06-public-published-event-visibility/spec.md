@@ -15,6 +15,7 @@ Included:
 - Publication-state-aware anonymous detail behavior
 - Correct hidden behavior for pending and rejected states
 - Public propagation of admin-published event content into the intended surfaces
+- Removal from anonymous visibility when an organizer edit returns a previously published event to `pending_approval`
 
 Excluded:
 - Auth foundation
@@ -37,6 +38,7 @@ Success criteria:
 - `SC-006`
 - `SC-007`
 - `SC-008`
+- `SC-008A`
 
 ## Independent Verification
 
@@ -47,6 +49,7 @@ A pending event remains hidden from anonymous users, and once an admin publishes
 This slice is functionally complete when:
 - pending and rejected events remain hidden from anonymous users
 - published events appear on intended public surfaces
+- organizer-edited previously published events disappear from anonymous public surfaces until re-approved
 - public detail and listing behavior follows the publication-state contract
 - public experience remains accessible and regression-safe after publication-state changes
 
@@ -71,7 +74,7 @@ Slice-specific:
 ## Required Evidence
 
 - Integration tests for publication-state-aware listing and detail behavior
-- End-to-end tests for hidden pending behavior and visible published behavior
+- End-to-end tests for hidden pending behavior, visible published behavior, and temporary removal of edited published events until re-approval
 - Regression tests for previously working event discovery routes and details
 - Accessibility validation for all changed public surfaces
 
@@ -88,6 +91,7 @@ Slice-specific:
 Hard dependencies:
 - Slice 03
 - Slice 05
+- Slice 08
 
 Recommended dependencies:
 - Slice 01 for coherent public surface delivery

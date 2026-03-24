@@ -16,6 +16,7 @@ Included:
 - Moderation queue or equivalent review surface
 - Publish and reject actions
 - Global event-management capability beyond organizer ownership boundaries
+- Moderation of newly submitted events and organizer-edited published events that re-enter `pending_approval`
 
 Excluded:
 - Public anonymous discovery behavior after publication propagation
@@ -54,6 +55,7 @@ An authenticated admin can review a pending event, publish or reject it, and man
 This slice is functionally complete when:
 - admin users can access a dedicated admin panel
 - admin users can publish and reject pending events
+- admin users can review events that re-enter moderation after organizer edits to previously published records
 - admin users can manage records outside organizer ownership boundaries
 - organizer or uploader users are denied admin-only capabilities
 
@@ -79,7 +81,7 @@ Slice-specific:
 ## Required Evidence
 
 - Unit tests for moderation actions and role checks
-- Integration tests for admin management flows and organizer-status reflection
+- Integration tests for admin management flows, organizer-status reflection, and re-approval of organizer-edited published events
 - End-to-end tests for admin publish and reject journeys
 - Authorization tests for admin-only actions and organizer denial paths
 - Network-security evidence for protected management endpoints
@@ -97,6 +99,7 @@ Slice-specific:
 Hard dependencies:
 - Slice 02
 - Slice 03
+- Slice 08
 
 Enables:
 - Slice 06
