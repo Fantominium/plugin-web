@@ -1,6 +1,6 @@
 # Slice Spec: Organizer Dashboard and Event Editing
 
-**Parent Feature**: [spec.md](/Users/malcolm/Desktop/projects/plugin/plugin-web/specs/001-pluginbim-public-and-organizer-rework/spec.md)  
+**Parent Feature**: [spec.md](../../spec.md)  
 **Slice ID**: `04-organizer-dashboard-and-event-editing`  
 **Status**: Draft
 
@@ -16,6 +16,7 @@ Included:
 - Preview behavior for owned records
 - Update page with pre-populated data
 - Ownership enforcement for organizer edits
+- Reset of edited `published` events back to `pending_approval`
 
 Excluded:
 - Admin global management behavior
@@ -31,7 +32,11 @@ User stories:
 Functional requirements:
 - `FR-009` through `FR-012`
 - `FR-021` through `FR-024`
+- `FR-024B`
 - `FR-029`
+
+Success criteria:
+- `SC-008A`
 
 Key entities:
 - `OrganizerProfile`
@@ -48,6 +53,7 @@ This slice is functionally complete when:
 - organizer dashboard data is restricted to owned records
 - organizers can preview and edit only allowed records
 - the update page respects its field boundaries, including no dedicated pricing section
+- editing a previously `published` event returns it to `pending_approval` and updates organizer-visible status messaging
 - unauthorized access to non-owned records is denied server-side
 
 ## Required Quality Gates
@@ -71,7 +77,7 @@ Slice-specific:
 ## Required Evidence
 
 - Unit tests for ownership logic and update validations
-- Integration tests for dashboard listing and update persistence
+- Integration tests for dashboard listing, update persistence, and `published` to `pending_approval` status reset behavior
 - End-to-end tests for organizer-managed edit behavior
 - Regression tests for existing discovery behavior touched by preview or detail wiring
 - Authorization tests for owned versus non-owned access
@@ -88,6 +94,7 @@ Slice-specific:
 
 Hard dependencies:
 - Slice 02
+- Slice 08
 
 Recommended dependencies:
 - Slice 03 if dashboard completeness should include newly created pending records

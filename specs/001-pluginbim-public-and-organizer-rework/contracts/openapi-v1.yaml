@@ -1,0 +1,501 @@
+openapi: 3.1.0
+info:
+  title: Plugin Web API
+  version: 1.0.0
+  description: >-
+    MVP API contract for public event discovery, authentication support, organizer
+    event management, poster uploads, and admin moderation.
+servers:
+  - url: http://localhost:3000
+paths:
+  /api/v1/public/events:
+    get:
+      summary: List published public events
+      tags: [PublicEvents]
+      responses:
+        '200':
+          description: Published events returned successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EventSummary'
+  /api/v1/public/events/{eventId}:
+    get:
+      summary: Get a published public event by id
+      tags: [PublicEvents]
+      parameters:
+        - in: path
+          name: eventId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Event detail returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventDetail'
+        '404':
+          description: Event not found or not public
+  /api/v1/auth/magic-link:
+    post:
+      summary: Request an email magic link
+      tags: [Authentication]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MagicLinkRequest'
+      responses:
+        '202':
+          description: Magic link request accepted
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+  /api/v1/organizer/events:
+    get:
+      summary: List organizer-owned events
+      tags: [OrganizerEvents]
+      responses:
+        '200':
+          description: Organizer event list returned successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/OrganizerEventSummary'
+        '401':
+          description: Authentication required
+        '403':
+          description: Organizer scope required
+    post:
+      summary: Create a new organizer event
+      tags: [OrganizerEvents]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEventRequest'
+      responses:
+        '201':
+          description: Event created in pending approval state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventMutationResponse'
+        '401':
+          description: Authentication required
+        '403':
+          description: Organizer scope required
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+  /api/v1/organizer/events/{eventId}:
+    patch:
+      summary: Update an organizer-owned event
+      tags: [OrganizerEvents]
+      parameters:
+        - in: path
+          name: eventId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEventRequest'
+      responses:
+        '200':
+          description: Event updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventMutationResponse'
+        '401':
+          description: Authentication required
+        '403':
+          description: Ownership or organizer scope violation
+        '404':
+          description: Event not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+  /api/v1/organizer/events/{eventId}/status:
+    get:
+      summary: Get organizer-visible event status
+      tags: [OrganizerEvents]
+      parameters:
+        - in: path
+          name: eventId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Event status returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventStatusResponse'
+        '401':
+          description: Authentication required
+        '403':
+          description: Ownership or organizer scope violation
+        '404':
+          description: Event not found
+  /api/v1/uploads/posters:
+    post:
+      summary: Upload and validate a poster asset
+      tags: [Uploads]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [poster]
+              properties:
+                poster:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: Poster uploaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PosterUploadResponse'
+        '400':
+          description: Invalid file type or payload
+        '413':
+          description: File too large
+  /api/v1/admin/events:
+    get:
+      summary: List admin-visible events for moderation
+      tags: [AdminEvents]
+      responses:
+        '200':
+          description: Admin event list returned successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AdminEventSummary'
+        '401':
+          description: Authentication required
+        '403':
+          description: Admin scope required
+  /api/v1/admin/events/{eventId}/moderation:
+    post:
+      summary: Publish or reject an event
+      tags: [AdminEvents]
+      parameters:
+        - in: path
+          name: eventId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModerationActionRequest'
+      responses:
+        '200':
+          description: Moderation action applied successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModerationActionResponse'
+        '401':
+          description: Authentication required
+        '403':
+          description: Admin scope required
+        '404':
+          description: Event not found
+components:
+  schemas:
+    EventSummary:
+      type: object
+      required: [id, eventName, startAt, endAt, locationLabel]
+      properties:
+        id:
+          type: string
+          format: uuid
+        eventName:
+          type: string
+        startAt:
+          type: string
+          format: date-time
+        endAt:
+          type: string
+          format: date-time
+        locationLabel:
+          type: string
+        posterUrl:
+          type: string
+          nullable: true
+    EventDetail:
+      allOf:
+        - $ref: '#/components/schemas/EventSummary'
+        - type: object
+          required: [description]
+          properties:
+            description:
+              type: string
+            ticketUrl:
+              type: string
+              nullable: true
+            registrationUrl:
+              type: string
+              nullable: true
+            socialUrl:
+              type: string
+              nullable: true
+            pricing:
+              type: array
+              items:
+                $ref: '#/components/schemas/PricingTier'
+    OrganizerEventSummary:
+      allOf:
+        - $ref: '#/components/schemas/EventSummary'
+        - type: object
+          required: [status]
+          properties:
+            status:
+              $ref: '#/components/schemas/SubmissionStatus'
+            previewUrl:
+              type: string
+    AdminEventSummary:
+      allOf:
+        - $ref: '#/components/schemas/OrganizerEventSummary'
+        - type: object
+          required: [organizerEmail]
+          properties:
+            organizerEmail:
+              type: string
+    CreateEventRequest:
+      type: object
+      required:
+        - emailAddress
+        - eventName
+        - startDate
+        - startTime
+        - endDate
+        - description
+        - locationId
+        - pricing
+      properties:
+        emailAddress:
+          type: string
+          format: email
+        eventName:
+          type: string
+        startDate:
+          type: string
+          format: date
+        startTime:
+          type: string
+        endDate:
+          type: string
+          format: date
+        ticketUrl:
+          type: string
+          nullable: true
+        registrationUrl:
+          type: string
+          nullable: true
+        socialUrl:
+          type: string
+          nullable: true
+        description:
+          type: string
+        posterAssetId:
+          type: string
+          format: uuid
+          nullable: true
+        locationId:
+          type: string
+        pricing:
+          type: array
+          items:
+            $ref: '#/components/schemas/PricingTier'
+    UpdateEventRequest:
+      type: object
+      required:
+        - emailAddress
+        - eventName
+        - startDate
+        - startTime
+        - endDate
+        - description
+        - locationId
+      properties:
+        emailAddress:
+          type: string
+          format: email
+        eventName:
+          type: string
+        startDate:
+          type: string
+          format: date
+        startTime:
+          type: string
+        endDate:
+          type: string
+          format: date
+        ticketUrl:
+          type: string
+          nullable: true
+        registrationUrl:
+          type: string
+          nullable: true
+        socialUrl:
+          type: string
+          nullable: true
+        description:
+          type: string
+        posterAssetId:
+          type: string
+          format: uuid
+          nullable: true
+        locationId:
+          type: string
+    PricingTier:
+      type: object
+      required: [label, amountMinor, currencyCode]
+      properties:
+        label:
+          type: string
+        amountMinor:
+          type: integer
+          minimum: 0
+        currencyCode:
+          type: string
+          pattern: '^[A-Z]{3}$'
+    EventMutationResponse:
+      type: object
+      required: [eventId, status, notification]
+      properties:
+        eventId:
+          type: string
+          format: uuid
+        status:
+          $ref: '#/components/schemas/SubmissionStatus'
+        notification:
+          type: object
+          required: [deliveryStatus]
+          properties:
+            deliveryStatus:
+              type: string
+              enum: [sent, failed, skipped]
+            warning:
+              type: string
+              nullable: true
+    EventStatusResponse:
+      type: object
+      required: [eventId, status]
+      properties:
+        eventId:
+          type: string
+          format: uuid
+        status:
+          $ref: '#/components/schemas/SubmissionStatus'
+        rejectionReason:
+          type: string
+          nullable: true
+    PosterUploadResponse:
+      type: object
+      required: [posterAssetId, publicPath, mimeType, sizeBytes]
+      properties:
+        posterAssetId:
+          type: string
+          format: uuid
+        publicPath:
+          type: string
+        mimeType:
+          type: string
+        sizeBytes:
+          type: integer
+    MagicLinkRequest:
+      type: object
+      required: [email]
+      properties:
+        email:
+          type: string
+          format: email
+    ModerationActionRequest:
+      type: object
+      required: [action]
+      properties:
+        action:
+          type: string
+          enum: [publish, reject]
+        reason:
+          type: string
+          nullable: true
+    ModerationActionResponse:
+      type: object
+      required: [eventId, status]
+      properties:
+        eventId:
+          type: string
+          format: uuid
+        status:
+          $ref: '#/components/schemas/SubmissionStatus'
+    SubmissionStatus:
+      type: string
+      enum: [pending_approval, rejected, published]
+    ValidationError:
+      type: object
+      required: [message, errors]
+      properties:
+        message:
+          type: string
+        errors:
+          type: array
+          items:
+            type: object
+            required: [field, code]
+            properties:
+              field:
+                type: string
+              code:
+                type: string
+              detail:
+                type: string

@@ -3,19 +3,32 @@
 **Feature Branch**: `001-pluginbim-public-and-organizer-rework`  
 **Created**: 2026-03-23  
 **Status**: Draft  
-**Input**: User description: "Rework the existing Plugin Web application so the public-facing experience replicates, where appropriate, the functionality and overall feel of https://pluginbim.com/, while also adding a Contact Us page, secure MVP login limited to Google and email magic link with later expansion capability, an authenticated organizer dashboard, an event upload page, an event update page for organizers to manage events associated with their profile, and an admin panel with full management capabilities for admin users and restricted capabilities for event owner/uploader users."
+**Input**: User description: "Rework the existing Plugin Web application so the public-facing experience replicates, where appropriate, the functionality and overall feel of <https://pluginbim.com/>, while also adding a Contact Us page, secure MVP login limited to Google and email magic link with later expansion capability, an authenticated organizer dashboard, an event upload page, an event update page for organizers to manage events associated with their profile, and an admin panel with full management capabilities for admin users and restricted capabilities for event owner/uploader users."
+
+## Clarifications
+
+### Session 2026-03-23
+
+- Q: What happens when an organizer edits an already published event? → A: Any organizer edit to a published event resets it to `pending_approval` until admin re-approves.
+- Q: How are admin users designated in MVP? → A: Admin role is assigned only to a predefined allowlist of approved accounts.
+- Q: What happens if notification delivery fails after a valid event submission? → A: Save the event, keep its workflow state, and show a warning that notification failed.
+- Q: How is the controlled location list managed in MVP? → A: Locations come from a repository-managed static dataset or config file updated by developers.
+- Q: What is the magic-link expiration and replay policy for MVP? → A: Magic links are valid for 15 minutes and single use.
+- User-provided clarification: MVP notification delivery should use a secure provider with a free tier or equivalent no-cost entry option.
+- User-provided clarification: Persisted application data should use PostgreSQL running in a containerized service, and the feature should include a dedicated containerization slice.
+- User-provided clarification: API contract versioning should follow industry best practices.
 
 ## Constitution Gate Classification *(mandatory)*
 
 | Area | In Scope? | Notes |
-|------|-----------|-------|
+| ----- | ----------- | ------- |
 | User-facing UI / Accessibility | Yes | Main page, events discovery, contact page, login flow, organizer dashboard, admin panel, upload page, update page, moderation views, event detail flows, responsive states, pricing inputs, status indicators, and form UX |
 | Business Logic | Yes | Event ownership, create/update validation, submission workflow, admin moderation workflow, role-based management, upload processing, dashboard filtering, form handling, pricing capture, and email notification workflow |
 | API Contract | Yes | Public event retrieval, organizer-authenticated event create/update endpoints, admin-management endpoints, profile-scoped dashboard endpoints, moderation status endpoints, and file upload contract |
 | Authentication / Authorization | Yes | Secure MVP login via Google and email magic link, role assignment, admin and organizer session management, route protection, and ownership enforcement for restricted users |
-| Database / Migrations | Yes | User roles, organizer profiles, admin-capable user records, events, event ownership, uploaded assets metadata, location catalog, moderation state, and notification audit metadata if persisted |
+| Database / Migrations | Yes | User roles, organizer profiles, admin-capable user records, events, event ownership, uploaded assets metadata, location catalog, moderation state, notification audit metadata if persisted, and PostgreSQL-backed persistence |
 | Caching | No | Not required for first-pass MVP unless public event caching is added later |
-| Container / Deployment | No | No deployment architecture change required in this feature scope |
+| Container / Deployment | Yes | The feature includes app containerization plus a containerized PostgreSQL service for local development, CI validation, and migration execution |
 | Network Security | Yes | OAuth/OIDC flow, magic-link login, file upload validation, CORS policy, CSRF/session handling, session expiry handling, upload abuse controls, timeout handling, and email delivery boundaries |
 | Performance Sensitivity | Yes | Homepage loading, event browsing responsiveness, dashboard responsiveness, upload handling, image optimization |
 
@@ -28,8 +41,9 @@
 - **Accessibility Validation**: Automated accessibility scanning on changed routes, manual keyboard verification for navigation, dialog/modal behavior, authenticated forms, upload controls, organizer dashboard workflows, and admin-panel workflows; focus-management checks for login and form errors; semantic-structure verification; accessible-name verification for interactive controls; color-contrast validation; and state-change announcement verification for authentication, submission, validation, and moderation-status updates.
 - **Security Validation**: Authn/authz tests for protected pages and event ownership, role-boundary validation between admin and organizer users, explicit allow-path and deny-path coverage, privilege-escalation prevention tests, file upload type/size validation, secure session handling, safe email workflow boundaries, magic-link abuse protections, secret protection, least-privilege enforcement for privileged operations, CORS posture validation, CSRF/session-integrity validation, timeout-behavior validation, and abuse-control validation for externally reachable actions.
 - **Contract Validation**: Schema validation for public event payloads, organizer dashboard responses, admin panel responses, create/update request bodies, moderation-status responses, upload metadata, and notification request payloads.
-- **Contract Validation Mechanism**: This feature MUST introduce versioned OpenAPI or Swagger contract artifacts and a dedicated repository validation command such as `test:contracts` or `contracts:validate` so `validate-contracts.sh` can produce non-placeholder evidence.
+- **Contract Validation Mechanism**: This feature MUST introduce versioned OpenAPI or Swagger contract artifacts following industry-standard versioning practices and a dedicated repository validation command such as `test:contracts` or `contracts:validate` so `validate-contracts.sh` can produce non-placeholder evidence.
 - **Migration Validation**: Disposable database validation for organizer profile, events, ownership relations, location data, moderation state transitions, uniqueness constraints, and rollback-safe schema changes.
+- **Container Validation**: The app container image and the containerized PostgreSQL service MUST boot successfully together in local or CI validation, with the app proving database connectivity, migration execution, and production-build readiness inside the containerized runtime.
 - **Performance Validation**: Recorded evidence for homepage render, dashboard readiness, submission acknowledgement, upload-feedback latency, and filtered-search response times using an agreed measurement method and representative test conditions.
 
 ## Automation and Gate Mapping *(mandatory)*
@@ -40,7 +54,7 @@
 - **Type Safety Gate**: `yarn typecheck` MUST pass with zero errors.
 - **Unit and Integration Evidence**: `yarn test:ci` MUST cover changed business logic and integration boundaries.
 - **Secret and Dependency Safety Gate**: Repository secret scanning and dependency-safety checks required by the repo quality-gate process MUST report no prohibited secret findings or newly introduced disallowed dependency risk.
-- **Accessibility Gate**: `scripts/quality-gates/validate-accessibility.sh` plus manual keyboard and focus verification notes for changed flows.
+- **Accessibility Gate**: `scripts/quality-gates/validate-accessibility.sh` plus recorded manual keyboard and focus verification notes for every changed interactive flow are required evidence.
 - **Contract Gate**: `scripts/quality-gates/validate-contracts.sh` MUST validate any introduced or updated request/response contracts.
 - **Contract Tooling Enablement Requirement**: If this feature introduces or updates API contracts, it MUST also add the OpenAPI/Swagger artifacts and the package-level contract-validation command required for `validate-contracts.sh` to run successfully in CI.
 - **Migration Gate**: `scripts/quality-gates/validate-postgres-migrations.sh` MUST validate schema changes against a disposable PostgreSQL instance.
@@ -52,12 +66,13 @@
 - **Spec Readiness Gate**: `speckit.spec-readiness` MUST be run before planning and before task generation, and `speckit.spec-readiness-checklist` MAY be generated for reviewer use.
 - **Tooling Enablement Requirement**: Because the current repository does not yet expose dedicated automated E2E and accessibility test commands, this feature MUST include the tooling and script additions necessary to make `validate-e2e.sh` and `validate-accessibility.sh` produce enforceable evidence rather than `N/A` results.
 - **Migration Tooling Enablement Requirement**: If this feature introduces schema changes or persisted workflow tables, it MUST also include the migration automation and disposable PostgreSQL configuration needed for `validate-postgres-migrations.sh` to produce enforceable evidence rather than a placeholder or failing-unconfigured path.
+- **Containerization Enablement Requirement**: Because PostgreSQL-backed persistence and container runtime support are in scope, this feature MUST include the app container definition and orchestration or compose configuration needed to run the web app and PostgreSQL together for local development and CI validation.
 
 ## Specification Gate Status *(mandatory)*
 
 | Gate | Status | Evidence |
-|------|--------|----------|
-| S1 Change Classification | PASS | All impacted areas are explicitly classified in Constitution Gate Classification with scope notes for UI, business logic, API, authz, database, security, and performance. |
+| ----- | -------- | ---------- |
+| S1 Change Classification | PASS | All impacted areas are explicitly classified in Constitution Gate Classification with scope notes for UI, business logic, API, authz, database, containerization, security, and performance. |
 | S2 Test Strategy | PASS | Required Validation Evidence defines unit, integration, end-to-end, regression, accessibility, security, contract, and migration evidence by scope. |
 | S3 Accessibility Scope | PASS | Accessibility validation and functional requirements explicitly cover keyboard use, focus order, semantic structure, accessible names, color contrast, validation errors, and state-change announcements. |
 | S4 Security Scope | PASS | Security scope explicitly covers authn/authz, role and ownership checks, allow-path and deny-path coverage, least privilege, secret protection, CSRF/session handling, upload validation, and abuse controls. |
@@ -118,9 +133,9 @@ An organizer can securely sign in using Google or an email magic-link flow, acce
 
 ### User Story 4 - Admin Signs In And Manages The Platform (Priority: P1)
 
-An authenticated admin can access an admin panel with full management capabilities across users, events, moderation state, and publishing actions, while organizer/uploader users remain restricted to their own records.
+An authenticated admin can access an admin panel with management capabilities across submitted events, moderation state, and publishing actions, while organizer/uploader users remain restricted to their own records.
 
-**Why this priority**: You want moderation and full platform management included in MVP, which requires a first-class admin surface rather than a manual external process.
+**Why this priority**: You want event moderation and publishing included in MVP, which requires a first-class admin surface rather than a manual external process.
 
 **Independent Test**: An admin can sign in, open the admin panel, review pending events, publish or reject them, and manage records beyond a single organizer scope, while an organizer cannot access the same capabilities.
 
@@ -222,15 +237,17 @@ Public visitors can discover and view events that organizers have submitted or u
 - **FR-003**: The system MUST provide a dedicated Contact Us page reachable from public navigation.
 - **FR-004**: The Contact Us page MUST display business contact details and approved social links.
 - **FR-005**: The system MUST provide secure MVP authentication limited to Google login and email magic-link login.
+- **FR-005A**: Email magic links in MVP MUST expire after 15 minutes and MUST be invalid after their first successful use.
 - **FR-006**: The authentication architecture MUST allow additional providers to be added later without reworking the core authorization model.
 - **FR-007**: The system MUST create or associate an organizer profile upon successful authenticated login.
 - **FR-008**: The system MUST provide an authenticated organizer dashboard as the default post-login landing page.
 - **FR-008A**: The system MUST provide an authenticated admin panel as the default post-login landing page for admin users.
+- **FR-008B**: The system MUST assign MVP admin access only to accounts present in a predefined approved allowlist and MUST treat all other authenticated users as non-admin unless their account is explicitly allowlisted.
 - **FR-009**: The organizer dashboard MUST allow the organizer to view only events associated with their own profile.
 - **FR-010**: The organizer dashboard MUST provide clear actions to create a new event and edit an existing owned event.
 - **FR-011**: The organizer dashboard MUST provide a public preview action for each event associated with the organizer profile.
 - **FR-012**: The organizer dashboard MUST display the current submission or publication status for each organizer-owned event.
-- **FR-012A**: The admin panel MUST provide full management capability over submitted events, event publication status, and user-accessible moderation actions required by MVP.
+- **FR-012A**: The admin panel MUST provide management capability over submitted events, event publication status, and moderation actions required by MVP.
 - **FR-012B**: The admin panel MUST allow admin users to review, publish, reject, and otherwise manage events across all organizer profiles.
 - **FR-012C**: Organizer or uploader users MUST NOT have access to admin-only management actions or global event visibility beyond their own records.
 - **FR-013**: The system MUST provide a protected event upload page for authenticated organizers.
@@ -238,6 +255,7 @@ Public visitors can discover and view events that organizers have submitted or u
 - **FR-015**: The upload page form MUST include fields for `emailAddress`, `eventName`, `startDate`, `startTime`, `endDate`, `ticketUrl`, `registrationUrl`, `socialUrl`, `description`, `poster`, and `location`.
 - **FR-016**: The dedicated pricing section on the upload page MUST capture actual event ticket-pricing data as part of the create-event workflow.
 - **FR-017**: The `location` field MUST be presented as a dropdown list sourced from a controlled location dataset.
+- **FR-017A**: In MVP, the controlled location dataset MUST be provided from a repository-managed static dataset or configuration source maintained by developers rather than organizer-entered free text or admin-managed CRUD.
 - **FR-018**: The `poster` field MUST support image upload with validation for allowed file types and size limits.
 - **FR-019**: The upload workflow MUST associate each successfully created event with the authenticated organizer profile.
 - **FR-020**: Newly created events MUST be stored in a `pending_approval` state and MUST NOT become publicly visible until they transition to `published` through the moderation workflow.
@@ -246,9 +264,12 @@ Public visitors can discover and view events that organizers have submitted or u
 - **FR-023**: The update page MUST pre-populate stored values for the selected event.
 - **FR-024**: The system MUST enforce server-side ownership rules so organizers can edit only events associated with their profile.
 - **FR-024A**: Admin users MUST be allowed to manage any event record required by the MVP moderation and management workflow, regardless of original organizer ownership.
+- **FR-024B**: Any organizer-submitted edit to an event currently in `published` status MUST reset that event to `pending_approval` until an admin re-approves it.
 - **FR-025**: The system MUST validate start date, start time, and end date combinations, including multi-day events.
 - **FR-026**: The system MUST validate all submitted URLs and either normalize or reject invalid values with accessible error messaging.
 - **FR-027**: The system MUST send event submission data to a configured email address or trigger an equivalent business notification workflow.
+- **FR-027A**: If notification delivery fails after a valid event create or update operation succeeds, the system MUST preserve the persisted event state, keep the resulting workflow status unchanged, and surface recoverable warning feedback to the authenticated user.
+- **FR-027B**: MVP notification delivery MUST use a secure managed provider with a free tier or equivalent no-cost entry option, and provider-specific logic MUST remain behind a server-side notification abstraction so the provider can be replaced later.
 - **FR-028**: The public event experience MUST remain browsable through homepage and event-detail surfaces using typed event data rather than hardcoded view-only fragments.
 - **FR-029**: The system MUST provide loading, empty, success, and error states for public and authenticated workflows.
 - **FR-030**: The system MUST provide responsive layouts for mobile and desktop across the main page, Contact Us page, login, dashboard, upload, and update routes.
@@ -259,10 +280,12 @@ Public visitors can discover and view events that organizers have submitted or u
 - **FR-033**: The system MUST preserve or improve the existing public event discovery foundation already present in the codebase rather than regress it.
 - **FR-034**: The system MUST define typed contracts for organizer profile data, dashboard event summaries, event create/update payloads, location options, pricing data, and notification requests.
 - **FR-034A**: The system MUST define typed contracts for user role data, admin panel summaries, moderation actions, and role-aware event management responses.
+- **FR-034B**: API contracts MUST follow industry-standard versioning practices: additive backward-compatible changes MAY stay within the current major version, while breaking changes MUST be released under a new major contract version with an explicit compatibility path.
 - **FR-035**: The system MUST persist organizer-owned events in a manner that supports pending-approval review, later public discovery after approval, and profile-scoped management.
+- **FR-035A**: Persisted relational application data for MVP MUST be stored in PostgreSQL, with the expected local and CI runtime provided through a containerized PostgreSQL service.
 - **FR-036**: The system MUST protect authenticated pages against unauthenticated access and protect mutation endpoints against unauthorized access.
 - **FR-037**: The system MUST implement a moderation-aware publication workflow in which organizer-submitted events require admin approval before public visibility, and approval MUST be the trigger that transitions the event from `pending_approval` to `published` on public surfaces.
-- **FR-038**: The system MUST be designed so the client can update supported locations, email destinations, and homepage content without rewriting the entire application architecture.
+- **FR-038**: The system MUST be designed so the client can update supported locations, email destinations, and homepage content without rewriting the entire application architecture; for MVP, location updates MAY be delivered through repository-managed configuration changes.
 - **FR-039**: The system MUST centralize authorization policy server-side so role-based access, ownership, protected-route access, and mutation permissions are enforced outside the client UI.
 - **FR-040**: The system MUST protect secrets and privileged credentials by keeping provider secrets, email-delivery credentials, and storage credentials outside client-accessible code and outside persisted browser state.
 - **FR-041**: The system MUST apply least-privilege rules to protected operations so organizers can act only on their own profiles and events, while non-owners and anonymous users are denied access.
@@ -270,16 +293,20 @@ Public visitors can discover and view events that organizers have submitted or u
 - **FR-043**: The system MUST define and enforce an explicit CORS policy for any externally reachable API routes or upload endpoints introduced by this feature.
 - **FR-044**: The system MUST define timeout expectations and failure behavior for authentication, upload, notification, and event-mutation requests that cross trust boundaries.
 - **FR-045**: The feature implementation MUST add or enable automated end-to-end and accessibility tooling so constitution-required UI and auth-flow evidence can be produced by repository automation.
+- **FR-045A**: The feature implementation MUST add containerization assets required to run the Next.js app and PostgreSQL together in local development and CI, including a production-oriented app container definition and orchestration configuration.
 
 ### Data Integrity and Migration Notes
 
 - User accounts MUST carry an explicit role or equivalent authorization classification that distinguishes admin users from organizer/uploader users.
+- MVP admin-role assignment MUST be derived from a predefined approved allowlist so admin access cannot be self-granted through product UI flows.
+- MVP persisted relational data MUST reside in PostgreSQL, and local or CI environments MUST use a containerized PostgreSQL service as the canonical runtime for migrations and integration validation.
 - Organizer profiles MUST be uniquely identifiable by provider subject or by the email address used for the approved authentication flow, with duplicate-profile creation prevented at the database level.
 - Every event record MUST belong to exactly one organizer profile through a non-null ownership relationship enforced by schema constraints.
 - Every persisted event record MUST use a controlled submission-status value from an explicit finite set: `pending_approval`, `rejected`, or `published`.
 - Status transitions MUST preserve auditability. At minimum, the system MUST retain the current status, the last moderation decision timestamp, and enough metadata to explain rejection to the organizer if rejection is supported in MVP.
 - Poster assets MUST either remain unassigned until event creation completes or be cleaned up safely if the event-creation transaction fails.
 - Location references used by events MUST resolve to a valid controlled location option and MUST reject orphaned or unknown location identifiers.
+- The controlled location option set in MVP MUST originate from a repository-managed static dataset or configuration source so validation and UI rendering use the same canonical list.
 - Migration planning MUST preserve existing public event-discovery data and provide a rollback or forward-fix path for organizer, ownership, moderation-status, and asset-association changes.
 - Migration validation MUST explicitly confirm uniqueness constraints, foreign-key integrity, allowed status values, and non-loss of existing public event records.
 
@@ -291,32 +318,41 @@ Public visitors can discover and view events that organizers have submitted or u
 - Organizer dashboard list endpoint or route handler MUST return only events owned by the authenticated organizer and SHOULD include summary status, preview eligibility, and last-updated metadata.
 - Admin panel list endpoints or route handlers MUST return role-appropriate global or platform-wide management data for authenticated admin users only.
 - Event-create endpoint or route handler MUST accept the normalized organizer event payload, validate required fields, create the record in a non-public state, and return `201` on success.
-- Event-update endpoint or route handler MUST validate organizer ownership server-side, reject unauthorized updates with `403`, and return `404` when the target event does not exist.
+- Event-create endpoint or route handler MUST treat notification delivery as a post-persistence side effect in MVP so a notification failure does not roll back a successfully created event record.
+- Event-update endpoint or route handler MUST validate organizer ownership server-side, reject unauthorized updates with `403`, return `404` when the target event does not exist, and reset previously `published` events to `pending_approval` when an organizer edit succeeds.
 - Poster-upload endpoint or route handler MUST validate content type and size, return structured upload metadata on success, and reject unsupported files with `400`.
 - Moderation-status endpoint or route handler MUST expose the organizer-visible status of owned events and MUST NOT expose moderation data for events outside the authenticated organizer scope.
 - Admin moderation endpoints or route handlers MUST allow authorized admin users to publish or reject pending events and MUST reject non-admin callers with `403`.
 - Authentication endpoints or handlers MUST support Google sign-in and email magic-link flows, and MUST return predictable success and failure states for session creation, expiry, and invalid login attempts.
+- Authentication endpoints or handlers for email magic-link login MUST enforce a 15-minute lifetime and single-use invalidation semantics for each issued link.
+- Authentication and session-establishment flows MUST evaluate the predefined approved admin allowlist during sign-in so admin-capable accounts land in admin-authorized sessions and non-allowlisted accounts do not.
 - Validation errors for create, update, upload, and auth flows MUST use structured error responses that the UI can map to accessible field or page-level messaging.
-- API contracts introduced or changed by this feature MUST be represented through versioned OpenAPI or Swagger artifacts, and any externally consumed or unstable contract MUST define an explicit compatibility path before release.
+- API contracts introduced or changed by this feature MUST be represented through versioned OpenAPI or Swagger artifacts, and contract evolution MUST follow industry-standard versioning practices with additive backward-compatible changes within a major version and explicit new major versions for breaking changes.
 
 ### Moderation Workflow Notes
 
 - Organizer-created events are persisted in `pending_approval` once successfully submitted. Unsaved in-progress form state during entry is client-side only and is not treated as a persisted workflow status in MVP.
 - Approval is the operational trigger that moves an event into its publicly visible published state in MVP.
+- Organizer edits to already `published` events MUST move those events back to `pending_approval` until a new admin approval decision is recorded.
 - Rejected events MUST remain visible in the organizer dashboard with a rejected status and enough context for the organizer to understand that public publication did not occur.
 - Organizer preview behavior in MVP SHOULD allow the organizer to inspect their own pending-approval, rejected, or published event representation without making non-public states publicly visible.
 - Admin review tooling is in scope for this MVP through the admin panel. Admin users perform moderation decisions within the product surface, while organizer/uploader users can only view the resulting status of their own submissions.
+- User-account administration beyond allowlist-driven role resolution is out of scope for MVP unless added in a later slice.
 
 ### Security and Authorization Notes
 
 - Organizer-protected and admin-protected actions MUST be enforced server-side through a centralized authorization policy layer rather than by client-side route guards alone.
 - Authorization evidence MUST cover at minimum: successful owner access, successful admin access, denial for anonymous access, denial for authenticated non-owners, denial for organizer access to admin-only routes, and denial for attempted privilege escalation.
+- Admin authorization MUST depend on predefined allowlist membership evaluated server-side at authentication and authorization time, with no self-service admin elevation path in MVP.
 - Google and magic-link credentials, email-delivery credentials, storage credentials, and any signing secrets MUST remain server-side and MUST NOT be exposed through client bundles, browser storage, or logs.
 - Session handling MUST use secure, tamper-resistant mechanisms appropriate to the chosen auth implementation, and expired or invalid sessions MUST fail closed.
+- Magic-link authentication MUST fail closed for expired, already-consumed, malformed, or replayed links and MUST surface predictable user-facing error states for those cases.
 - API routes and upload endpoints introduced by this feature MUST declare and enforce an explicit CORS posture, even if that posture is same-origin only in MVP.
 - External-facing requests MUST define timeout behavior, retry policy if any, and fail-safe behavior for authentication, uploads, and notifications.
 - File upload workflows MUST validate file type, file size, and content integrity before persistence and MUST reject unsupported content before it becomes publicly reachable.
 - Notification workflows MUST operate with least privilege and MUST be limited to the minimum configuration required to send organizer-submission notifications.
+- Notification delivery failure MUST be observable to the user and logs, but MUST NOT create duplicate event submissions or silently discard a successfully persisted event mutation.
+- Notification provider credentials MUST stay server-side, and the selected MVP provider SHOULD be a reputable secure managed service with a free tier or equivalent no-cost entry option.
 
 ### Performance Budgets
 
@@ -342,6 +378,9 @@ Public visitors can discover and view events that organizers have submitted or u
 - End date MAY be equal to or later than the start date, but it MUST NOT precede the start date.
 - The system MUST reject upload attempts whose file type, file size, or image integrity checks fail and MUST provide recoverable error feedback.
 - Expired sessions during protected form workflows MUST result in re-authentication requirements without silently discarding unsaved client-entered data where recovery is practical.
+- Expired, replayed, or otherwise invalid magic links MUST produce accessible authentication error feedback and MUST NOT create a valid session.
+- Notification delivery failures after successful persistence MUST produce a non-blocking warning state that confirms the event was saved while indicating that the business notification did not send.
+- Organizer edits to a `published` event MUST surface a success state that clearly indicates the event has returned to `pending_approval` and is no longer publicly visible until re-approved.
 - Authentication success, validation errors, upload failures, submission completion, and moderation-status changes SHOULD expose programmatically determinable state changes so assistive technologies can announce them when appropriate.
 
 ### Key Entities *(include if feature involves data)*
@@ -351,11 +390,13 @@ Public visitors can discover and view events that organizers have submitted or u
 - **EventRecord**: Represents a public or review-scoped event created by an organizer, including ownership, name, start date, start time, end date, description, links, poster asset reference, location, pricing data, publication status, and audit metadata.
 - **EventFormSubmission**: Represents the normalized create or update payload submitted from the upload or update form before persistence and notification handling.
 - **LocationOption**: Represents an allowed selectable event location for the upload and update form dropdown.
+- **LocationOption** in MVP is sourced from a repository-managed static dataset or configuration file that defines the canonical selectable locations.
 - **PosterAsset**: Represents an uploaded image file and its validated metadata, storage reference, and association to an event.
 - **OrganizerSession**: Represents the authenticated session and authorization context used to access protected organizer workflows.
 - **AdminSession**: Represents the authenticated session and authorization context used to access admin-only workflows and moderation actions.
 - **AdminAction**: Represents an admin-triggered management or moderation action such as publishing, rejecting, or otherwise managing an event or related user-visible record.
 - **NotificationRequest**: Represents an outbound business email or notification generated by event-submission workflows or internal moderation operations.
+- **ContainerizedPostgresRuntime**: Represents the containerized PostgreSQL service used for local development, migration validation, and CI-backed integration execution in MVP.
 - **SubmissionStatus**: Represents the lifecycle state of a persisted organizer event, such as pending approval, rejected, or published, and is shown in the organizer dashboard.
 
 ## Success Criteria *(mandatory)*
@@ -366,13 +407,17 @@ Public visitors can discover and view events that organizers have submitted or u
 - **SC-002**: 100% of public and authenticated navigation links on changed surfaces resolve to implemented routes with no dead-end pages.
 - **SC-003**: An authenticated organizer can complete a valid event creation flow, including poster upload, pricing capture, and location selection, without manual administrator intervention during submission.
 - **SC-003A**: An authenticated admin can review and publish or reject pending events from the admin panel without leaving the product surface.
+- **SC-003B**: Only accounts present in the predefined approved admin allowlist can reach admin-authorized sessions or admin routes in all tested login scenarios.
+- **SC-003C**: Email magic-link login accepts only single-use links within 15 minutes of issuance and rejects expired or replayed links in all tested authentication scenarios.
 - **SC-004**: An authenticated organizer can update one of their own events successfully, and unauthorized users are prevented from editing events they do not own.
 - **SC-005**: Public and protected form workflows provide accessible validation and report zero serious or critical automated accessibility violations on changed surfaces.
 - **SC-006**: Stakeholder review confirms that the reworked main page captures the structure and feel of the pluginbim.com experience while supporting the client-requested organizer workflows.
 - **SC-007**: The organizer dashboard shows only profile-associated events for the authenticated organizer in all tested role and ownership scenarios, while the admin panel shows the broader management data permitted to admin users.
 - **SC-008**: Organizer-submitted events remain non-public while in `pending_approval`, become publicly discoverable once `published`, and the dashboard accurately reflects their submission status in all tested workflow states.
-- **SC-009**: Event-submission notifications reach the configured business destination in the approved success path and fail with recoverable user feedback in the approved error path.
+- **SC-008A**: When an organizer edits a previously `published` event, the event returns to `pending_approval`, disappears from anonymous public visibility until re-approved, and the organizer dashboard reflects that transition accurately.
+- **SC-009**: Event-submission notifications reach the configured business destination in the approved success path, and when notification delivery fails after a successful create or update, the organizer receives recoverable warning feedback without losing the saved event.
 - **SC-010**: The final design remains responsive and usable on mobile and desktop for the homepage, Contact Us page, login, organizer dashboard, admin panel, upload, and update flows.
+- **SC-011**: The containerized app and PostgreSQL stack can be started in a documented local or CI workflow, the app connects successfully to PostgreSQL, and required migrations run without manual environment surgery.
 
 ## Delivery Slices and Functional Completion Model
 
@@ -387,29 +432,34 @@ This feature SHOULD be delivered in independently testable slices. Each slice is
 - A slice that changes schema or persistence MUST also pass `P8 PostgreSQL Migration`.
 - A slice that changes protected actions, roles, ownership, or moderation MUST also pass `P9 Authorization`.
 - A slice that changes external or trust-boundary behavior MUST also pass `P12 Network Security`.
+- A slice that introduces or changes container runtime assets MUST also pass `P11 Container Security` and prove the containerized runtime boots successfully.
 - A slice that fixes or replaces existing behavior MUST include the required `P4 Regression` evidence for the touched behavior.
-- `P11 Container Security` and `P13 Caching` remain `N/A` unless a later implementation slice explicitly introduces container-runtime or caching changes.
+- `P13 Caching` remains `N/A` unless a later implementation slice explicitly introduces caching changes.
 
 ### Slice 1 - Public Experience Foundation
 
 **Objective**: Deliver the public-facing homepage, Contact Us page, route validity, and baseline public information architecture so visitors can understand the product and navigate without dead ends.
 
 **Primary scope**:
+
 - User Story 1 - Browse the Main Public Experience
 - User Story 2 - Reach the Contact Us Experience
 - Functional requirements: `FR-001` through `FR-004`, `FR-028`, `FR-030`, `FR-031`, `FR-031A`, `FR-031B`, `FR-032`, `FR-033`, `FR-038`
 - Success criteria: `SC-001`, `SC-002`, `SC-005`, `SC-006`, `SC-010`
 
 **Key deliverables**:
+
 - Reworked PluginBIM-inspired main page
 - Responsive Contact Us page with business contact details and approved social links
 - Valid public navigation with no dead routes on changed surfaces
 - Public accessibility baseline for layout, semantics, names, focus, and announcements
 
 **Independent verification**:
+
 - A first-time visitor can load the homepage, understand the product, navigate to Contact Us, and move through public discovery entry points without broken navigation.
 
 **Required quality gates for functional completeness**:
+
 - Always-applicable gates
 - `P2 Integration` when homepage sections are wired to data or route boundaries
 - `P3 End-to-End`
@@ -421,21 +471,25 @@ This feature SHOULD be delivered in independently testable slices. Each slice is
 **Objective**: Establish secure MVP authentication, session handling, user-role assignment, protected routing, and server-side role-aware authorization for admin and organizer users.
 
 **Primary scope**:
+
 - User Story 3 - Organizer Signs In Securely
 - User Story 4 - Admin Signs In And Manages The Platform, limited to sign-in, routing, and role landing behavior
 - Functional requirements: `FR-005`, `FR-006`, `FR-007`, `FR-008`, `FR-008A`, `FR-036`, `FR-039`, `FR-040`, `FR-041`, `FR-042`, `FR-043`, `FR-044`
 - Key entities: `UserRole`, `OrganizerSession`, `AdminSession`, `OrganizerProfile`
 
 **Key deliverables**:
+
 - Google and email magic-link MVP login
 - Role assignment and post-login landing behavior
 - Protected organizer and admin route boundaries
 - Centralized server-side authorization policy
 
 **Independent verification**:
+
 - An organizer can sign in and reach the organizer dashboard, an admin can sign in and reach the admin panel, and unauthorized users are denied protected access.
 
 **Required quality gates for functional completeness**:
+
 - Always-applicable gates
 - `P2 Integration`
 - `P3 End-to-End`
@@ -450,11 +504,13 @@ This feature SHOULD be delivered in independently testable slices. Each slice is
 **Objective**: Deliver the organizer upload workflow so a restricted organizer can create a new event, upload a poster, capture pricing, and submit the event into `pending_approval`.
 
 **Primary scope**:
+
 - User Story 5 - Organizer Creates a New Event From the Upload Page
 - Functional requirements: `FR-013` through `FR-020`, `FR-025`, `FR-026`, `FR-027`, `FR-029`
 - Key entities: `EventFormSubmission`, `EventRecord`, `PosterAsset`, `LocationOption`, `NotificationRequest`, `SubmissionStatus`
 
 **Key deliverables**:
+
 - Protected upload page with exactly three sections
 - Create-event form with required fields
 - Poster upload validation and location selection
@@ -462,9 +518,11 @@ This feature SHOULD be delivered in independently testable slices. Each slice is
 - Submission notification trigger behavior
 
 **Independent verification**:
+
 - An authenticated organizer can open the upload page, submit a valid event, and see it appear in their dashboard in `pending_approval` status; invalid submissions are blocked with accessible feedback.
 
 **Required quality gates for functional completeness**:
+
 - Always-applicable gates
 - `P2 Integration`
 - `P3 End-to-End`
@@ -479,21 +537,25 @@ This feature SHOULD be delivered in independently testable slices. Each slice is
 **Objective**: Deliver the organizer-owned management surface so organizers can view only their events, preview public representations, and edit eligible records with restricted permissions.
 
 **Primary scope**:
+
 - User Story 6 - Organizer Updates an Existing Event
 - User Story 7 - Organizer Uses a Dashboard to Manage Profile-Scoped Events
 - Functional requirements: `FR-009` through `FR-012`, `FR-021` through `FR-024`, `FR-024A` excluded from this slice, `FR-029`
 - Key entities: `OrganizerProfile`, `EventRecord`, `SubmissionStatus`
 
 **Key deliverables**:
+
 - Organizer dashboard listing only owned events
 - Preview links for owned events
 - Update page with pre-populated data and restricted editing rules
 - Ownership enforcement for organizer-only edits
 
 **Independent verification**:
+
 - An organizer can view only their own events, open an update form for an owned event, save changes successfully, and is denied access to non-owned records.
 
 **Required quality gates for functional completeness**:
+
 - Always-applicable gates
 - `P2 Integration`
 - `P3 End-to-End`
@@ -507,20 +569,24 @@ This feature SHOULD be delivered in independently testable slices. Each slice is
 **Objective**: Deliver the admin panel with full MVP management capability so admin users can review, publish, reject, and manage event records across organizer boundaries.
 
 **Primary scope**:
+
 - User Story 4 - Admin Signs In And Manages The Platform
 - Functional requirements: `FR-008A`, `FR-012A`, `FR-012B`, `FR-012C`, `FR-024A`, `FR-034A`, `FR-037`, `FR-039`, `FR-041`, `FR-042`
 - Key entities: `UserRole`, `AdminSession`, `AdminAction`, `SubmissionStatus`, `EventRecord`
 
 **Key deliverables**:
+
 - Admin landing surface
 - Pending-event review queue or equivalent moderation views
 - Publish and reject actions
 - Global management permissions distinct from organizer scope
 
 **Independent verification**:
+
 - An authenticated admin can review a pending event, publish or reject it, and manage records outside a single organizer scope; an organizer or uploader cannot access these admin capabilities.
 
 **Required quality gates for functional completeness**:
+
 - Always-applicable gates
 - `P2 Integration`
 - `P3 End-to-End`
@@ -535,19 +601,23 @@ This feature SHOULD be delivered in independently testable slices. Each slice is
 **Objective**: Ensure moderated events flow correctly into the public experience so only `published` events become discoverable while non-public states remain hidden.
 
 **Primary scope**:
+
 - User Story 8 - Public Visitors Can View Updated Event Content
 - Functional requirements: `FR-020`, `FR-028`, `FR-033`, `FR-035`, `FR-037`
 - Success criteria: `SC-006`, `SC-007`, `SC-008`
 
 **Key deliverables**:
+
 - Public listing and detail behavior aligned to publication state
 - Correct hidden behavior for `pending_approval` and `rejected`
 - Published-event propagation into homepage, listing, and detail surfaces
 
 **Independent verification**:
+
 - A pending event remains hidden from anonymous users, and once an admin publishes it, the event becomes discoverable on the intended public surfaces.
 
 **Required quality gates for functional completeness**:
+
 - Always-applicable gates
 - `P2 Integration`
 - `P3 End-to-End`
@@ -561,30 +631,55 @@ This feature SHOULD be delivered in independently testable slices. Each slice is
 **Objective**: Make the repository capable of enforcing the required evidence paths so the feature can progress through CI and release gates without placeholder or `N/A` outcomes where the spec expects enforceable checks.
 
 **Primary scope**:
+
 - Automation and Gate Mapping section
 - Contract validation mechanism
 - Tooling enablement requirements for E2E, accessibility, contracts, build, and migrations
 - Performance validation plan
 - Functional requirements: `FR-045` plus any implementation needed to satisfy `Contract Validation Mechanism`, `Contract Tooling Enablement Requirement`, and `Migration Tooling Enablement Requirement`
+- Functional requirements: `FR-045`, `FR-034B`, and any implementation needed to satisfy `Contract Validation Mechanism`, `Contract Tooling Enablement Requirement`, and `Migration Tooling Enablement Requirement`
 
 **Key deliverables**:
+
 - Enforceable E2E path
 - Enforceable accessibility validation path
 - Versioned OpenAPI or Swagger artifacts plus runnable contract-validation command
 - Enforceable migration validation setup when schema work exists
+- Industry-standard contract versioning rules reflected in artifacts and validation
 - Production build evidence path and recorded performance evidence approach
 
 **Independent verification**:
+
 - The repo can produce non-placeholder evidence for the required build, E2E, accessibility, contract, and migration gates, and reviewers can point to those artifacts in CI.
 
+### Slice 8 - Containerization and PostgreSQL Runtime Foundation
+
+**Objective**: Deliver the container runtime needed for PostgreSQL-backed persistence and reproducible app execution so development, migration validation, and CI can run against the intended MVP runtime shape.
+
+**Primary scope**:
+
+- Container and deployment classification
+- Functional requirements: `FR-035A`, `FR-045A`
+- Validation requirements: `Container Validation`, `Containerization Enablement Requirement`
+- Key entities: `ContainerizedPostgresRuntime`
+
+**Key deliverables**:
+
+- Production-oriented app container definition
+- Orchestration or compose configuration for the web app and PostgreSQL
+- Documented environment wiring for containerized local and CI execution
+- Container-backed PostgreSQL runtime used for migrations and integration paths
+
+**Independent verification**:
+
+- A developer or CI job can start the containerized app and PostgreSQL stack, run migrations, and confirm the web app connects successfully to PostgreSQL.
+
 **Required quality gates for functional completeness**:
+
 - Always-applicable gates
 - `P1 Reproducible Build`
-- `P3 End-to-End`
-- `P5 Accessibility`
-- `P7 API Contract`
-- `P8 PostgreSQL Migration` when schema changes are introduced
-- `P6 SonarQube`
+- `P8 PostgreSQL Migration`
+- `P11 Container Security`
 
 ### Recommended Slice Sequencing
 
@@ -595,7 +690,8 @@ The recommended sequencing separates non-negotiable foundations from user-visibl
 These slices establish capability, enforcement, and security boundaries that later user-visible milestones depend on.
 
 1. Slice 7 - Quality-Gate and Operational Enablement
-2. Slice 2 - Authentication and Role Foundation
+2. Slice 8 - Containerization and PostgreSQL Runtime Foundation
+3. Slice 2 - Authentication and Role Foundation
 
 #### User-Visible Milestones
 
@@ -610,6 +706,7 @@ These slices deliver visible product value after the prerequisite capabilities a
 #### Parallelization Guidance
 
 - Slice 7 SHOULD start first and continue in parallel with later work until all required evidence paths are enforceable in CI.
+- Slice 8 SHOULD start with or immediately after Slice 7 because PostgreSQL-backed persistence and migration validation depend on the containerized runtime being available.
 - Slice 1 MAY begin in parallel with Slice 2 if public-page work avoids blocked dependencies on auth, role, or protected workflow infrastructure.
 - Slice 3 and Slice 4 SHOULD not be considered functionally complete until Slice 2 is in place because both rely on authenticated, role-aware, protected workflows.
 - Slice 5 SHOULD not begin before Slice 2 is stable and SHOULD not be considered complete before Slice 3 provides real pending-approval event records to moderate.
@@ -618,8 +715,10 @@ These slices deliver visible product value after the prerequisite capabilities a
 ### Slice Dependency Notes
 
 - Slice 7 is a prerequisite enabler for any slice that depends on currently missing automated E2E, accessibility, contract, build, or migration evidence.
+- Slice 8 is a prerequisite enabler for slices that depend on PostgreSQL persistence, migration execution, or containerized local and CI runtime parity.
 - Slice 2 is a prerequisite for Slices 3, 4, and 5.
 - Slice 1 is not a hard dependency for the protected workflow slices, but it is the first public-facing milestone and can be delivered independently once its own gates pass.
 - Slice 3 is a prerequisite for Slice 5 because moderation needs submitted events.
 - Slice 5 is a prerequisite for Slice 6 because public publication depends on admin moderation.
 - Slice 7 MUST be complete before any slice that relies on currently unavailable gate tooling is considered CI-ready or release-ready.
+- Slice 8 MUST be complete before any slice that relies on PostgreSQL-backed persistence or container-runtime validation is considered CI-ready or release-ready.
