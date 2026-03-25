@@ -1,6 +1,6 @@
 # Slice Spec: Organizer Event Submission
 
-**Parent Feature**: [spec.md](/Users/malcolm/Desktop/projects/plugin/plugin-web/specs/001-pluginbim-public-and-organizer-rework/spec.md)  
+**Parent Feature**: [spec.md](../../spec.md)  
 **Slice ID**: `03-organizer-event-submission`  
 **Status**: Draft
 

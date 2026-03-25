@@ -1,6 +1,6 @@
 # Slice Spec: Public Experience Foundation
 
-**Parent Feature**: [spec.md](/Users/malcolm/Desktop/projects/plugin/plugin-web/specs/001-pluginbim-public-and-organizer-rework/spec.md)  
+**Parent Feature**: [spec.md](../../spec.md)  
 **Slice ID**: `01-public-experience-foundation`  
 **Status**: Draft
 

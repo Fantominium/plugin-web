@@ -9,14 +9,31 @@ Auto-generated from all feature plans. Last updated: 2026-03-23
 ## Project Structure
 
 ```text
-backend/
-frontend/
-tests/
+app/
+public/
+scripts/
+specs/
+.github/
+.specify/
+
+README.md
+DEVELOPER_GUIDE.md
+QUALITY_GATES.md
+IMPLEMENTATION_PROGRESS.md
+
+package.json
+next.config.ts
+tsconfig.json
+eslint.config.mjs
+jest.config.js
 ```
 
 ## Commands
 
-npm test && npm run lint
+yarn dev
+yarn test
+yarn lint
+yarn build
 
 ## Code Style
 

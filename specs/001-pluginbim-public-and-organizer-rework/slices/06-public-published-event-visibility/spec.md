@@ -1,6 +1,6 @@
 # Slice Spec: Public Published Event Visibility
 
-**Parent Feature**: [spec.md](/Users/malcolm/Desktop/projects/plugin/plugin-web/specs/001-pluginbim-public-and-organizer-rework/spec.md)  
+**Parent Feature**: [spec.md](../../spec.md)  
 **Slice ID**: `06-public-published-event-visibility`  
 **Status**: Draft
 

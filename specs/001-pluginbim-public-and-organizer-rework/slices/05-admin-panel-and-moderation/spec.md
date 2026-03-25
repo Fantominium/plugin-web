@@ -1,6 +1,6 @@
 # Slice Spec: Admin Panel and Moderation
 
-**Parent Feature**: [spec.md](/Users/malcolm/Desktop/projects/plugin/plugin-web/specs/001-pluginbim-public-and-organizer-rework/spec.md)  
+**Parent Feature**: [spec.md](../../spec.md)  
 **Slice ID**: `05-admin-panel-and-moderation`  
 **Status**: Draft
 

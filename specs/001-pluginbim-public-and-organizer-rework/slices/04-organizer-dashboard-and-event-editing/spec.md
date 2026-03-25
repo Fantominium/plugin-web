@@ -1,6 +1,6 @@
 # Slice Spec: Organizer Dashboard and Event Editing
 
-**Parent Feature**: [spec.md](/Users/malcolm/Desktop/projects/plugin/plugin-web/specs/001-pluginbim-public-and-organizer-rework/spec.md)  
+**Parent Feature**: [spec.md](../../spec.md)  
 **Slice ID**: `04-organizer-dashboard-and-event-editing`  
 **Status**: Draft
 

@@ -1,6 +1,6 @@
 # Slice Spec: Authentication and Role Foundation
 
-**Parent Feature**: [spec.md](/Users/malcolm/Desktop/projects/plugin/plugin-web/specs/001-pluginbim-public-and-organizer-rework/spec.md)  
+**Parent Feature**: [spec.md](../../spec.md)  
 **Slice ID**: `02-authentication-and-role-foundation`  
 **Status**: Draft
 

@@ -1,6 +1,6 @@
 # Implementation Plan: PluginBIM-Inspired Public Experience and Role-Based Event Management Rework
 
-**Branch**: `001-pluginbim-public-and-organizer-rework` | **Date**: 2026-03-23 | **Spec**: [spec.md](/Users/malcolm/Desktop/projects/plugin/plugin-web/specs/001-pluginbim-public-and-organizer-rework/spec.md)
+**Branch**: `001-pluginbim-public-and-organizer-rework` | **Date**: 2026-03-23 | **Spec**: [spec.md](./spec.md)
 **Input**: Feature specification from `/specs/001-pluginbim-public-and-organizer-rework/spec.md`
 
 **Note**: This template is filled in by the `/speckit.plan` command. See `.specify/templates/plan-template.md` for the execution workflow.
@@ -10,12 +10,6 @@
 Rework the existing Next.js web application into a PluginBIM-inspired public event platform with protected organizer and admin workflows, backed by PostgreSQL and a containerized runtime. The implementation will use Auth.js v5 for Google and email magic-link authentication, Prisma ORM for typed PostgreSQL access and migrations, volume-backed poster storage behind a replaceable server-side abstraction, OpenAPI 3.1 contracts under `/api/v1`, and enforceable quality-gate tooling for E2E, accessibility, contracts, migrations, performance, and container security.
 
 ## Technical Context
-
-<!--
-  ACTION REQUIRED: Replace the content in this section with the technical details
-  for the project. The structure here is presented in advisory capacity to guide
-  the iteration process.
--->
 
 **Language/Version**: TypeScript 5.x on Node.js 20 LTS, React 19.2.3, Next.js 16.1.4  
 **Primary Dependencies**: Next.js App Router, Tailwind CSS 4, Auth.js v5, Prisma ORM, `@prisma/client`, Resend, Zod, Playwright, `@axe-core/playwright`, Lighthouse CI, `@redocly/cli`, `openapi-typescript`  
@@ -72,12 +66,6 @@ specs/[###-feature]/
 ```
 
 ### Source Code (repository root)
-<!--
-  ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
-  for this feature. Delete unused options and expand the chosen structure with
-  real paths (e.g., apps/admin, packages/something). The delivered plan must
-  not include Option labels.
--->
 
 ```text
 app/
@@ -137,10 +125,10 @@ specs/001-pluginbim-public-and-organizer-rework/
 
 ## Phase 0 Research Output
 
-- [research.md](/Users/malcolm/Desktop/projects/plugin/plugin-web/specs/001-pluginbim-public-and-organizer-rework/research.md)
+- [research.md](./research.md)
 
 ## Phase 1 Design Output
 
-- [data-model.md](/Users/malcolm/Desktop/projects/plugin/plugin-web/specs/001-pluginbim-public-and-organizer-rework/data-model.md)
-- [quickstart.md](/Users/malcolm/Desktop/projects/plugin/plugin-web/specs/001-pluginbim-public-and-organizer-rework/quickstart.md)
-- [contracts/openapi-v1.yaml](/Users/malcolm/Desktop/projects/plugin/plugin-web/specs/001-pluginbim-public-and-organizer-rework/contracts/openapi-v1.yaml)
+- [data-model.md](./data-model.md)
+- [quickstart.md](./quickstart.md)
+- [contracts/openapi-v1.yaml](./contracts/openapi-v1.yaml)

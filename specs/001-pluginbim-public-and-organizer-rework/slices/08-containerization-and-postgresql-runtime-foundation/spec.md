@@ -1,6 +1,6 @@
 # Slice Spec: Containerization and PostgreSQL Runtime Foundation
 
-**Parent Feature**: [spec.md](/Users/malcolm/Desktop/projects/plugin/plugin-web/specs/001-pluginbim-public-and-organizer-rework/spec.md)  
+**Parent Feature**: [spec.md](../../spec.md)  
 **Slice ID**: `08-containerization-and-postgresql-runtime-foundation`  
 **Status**: Draft
 

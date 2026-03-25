@@ -1,6 +1,6 @@
 # Slice Spec: Quality-Gate and Operational Enablement
 
-**Parent Feature**: [spec.md](/Users/malcolm/Desktop/projects/plugin/plugin-web/specs/001-pluginbim-public-and-organizer-rework/spec.md)  
+**Parent Feature**: [spec.md](../../spec.md)  
 **Slice ID**: `07-quality-gate-and-operational-enablement`  
 **Status**: Draft
 
