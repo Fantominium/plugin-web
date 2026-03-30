@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import SearchBar from '@/app/components/SearchBar/SearchBar';
+import { PUBLIC_ROUTES } from '@/app/lib/public-routes';
 import styles from './Header.module.css';
 
 const CATEGORY_TABS = [
@@ -158,7 +159,7 @@ export default function Header() {
           <ul className={styles.mobileNavList} aria-label="Mobile menu items">
             <li className={styles.mobileNavListItem}>
               <Link
-                href="/"
+                href={PUBLIC_ROUTES.home}
                 className={styles.mobileNavLink}
                 onClick={closeMobileMenu}
                 ref={firstMobileLinkRef}
@@ -167,25 +168,37 @@ export default function Header() {
               </Link>
             </li>
             <li className={styles.mobileNavListItem}>
-              <Link href="/events" className={styles.mobileNavLink} onClick={closeMobileMenu}>
+              <Link
+                href={PUBLIC_ROUTES.events}
+                className={styles.mobileNavLink}
+                onClick={closeMobileMenu}
+              >
                 Events
               </Link>
             </li>
             <li className={styles.mobileNavListItem}>
-              <Link href="/categories" className={styles.mobileNavLink} onClick={closeMobileMenu}>
-                Categories
+              <Link
+                href={PUBLIC_ROUTES.contactUs}
+                className={styles.mobileNavLink}
+                onClick={closeMobileMenu}
+              >
+                Contact Us
               </Link>
             </li>
             <li className={styles.mobileNavListItem}>
-              <Link href="/about" className={styles.mobileNavLink} onClick={closeMobileMenu}>
-                About
+              <Link
+                href={PUBLIC_ROUTES.privacyPolicy}
+                className={styles.mobileNavLink}
+                onClick={closeMobileMenu}
+              >
+                Privacy Policy
               </Link>
             </li>
           </ul>
 
           <div className={styles.mobileNavDivider}></div>
 
-          <nav className={styles.mobileTabsContainer} aria-label="Event categories">
+          <section className={styles.mobileTabsContainer} aria-label="Event categories">
             <ul className={styles.mobileTabsList} aria-label="Category shortcuts">
               {CATEGORY_TABS.map((tab) => (
                 <li key={tab.id} className={styles.mobileTabsListItem}>
@@ -203,11 +216,9 @@ export default function Header() {
                 </li>
               ))}
             </ul>
-          </nav>
+          </section>
         </nav>
       </dialog>
-
-      <main id="main-content"></main>
     </>
   );
 }

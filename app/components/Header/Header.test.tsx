@@ -30,8 +30,8 @@ describe('Header Component', () => {
 
       expect(screen.queryByRole('link', { name: /^home$/i })).not.toBeInTheDocument();
       expect(screen.queryByRole('link', { name: /^events$/i })).not.toBeInTheDocument();
-      expect(screen.queryByRole('link', { name: /^categories$/i })).not.toBeInTheDocument();
-      expect(screen.queryByRole('link', { name: /^about$/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole('link', { name: /^contact us$/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole('link', { name: /^privacy policy$/i })).not.toBeInTheDocument();
     });
 
     it('should render search bar component', () => {
@@ -55,7 +55,34 @@ describe('Header Component', () => {
       });
 
       expect(mobileNav).toHaveTextContent(/events/i);
-      expect(mobileNav).toHaveTextContent(/categories/i);
+      expect(mobileNav).toHaveTextContent(/contact us/i);
+      expect(mobileNav).toHaveTextContent(/privacy policy/i);
+    });
+
+    it('should only include implemented mobile navigation routes', async () => {
+      Object.defineProperty(globalThis, 'innerWidth', {
+        writable: true,
+        configurable: true,
+        value: 480,
+      });
+
+      const user = userEvent.setup();
+      render(<Header />);
+
+      await user.click(screen.getByRole('button', { name: /open menu/i }));
+
+      const mobileNav = screen.getByRole('navigation', {
+        name: /mobile navigation/i,
+        hidden: true,
+      });
+
+      const links = Array.from(mobileNav.querySelectorAll('a')).map((link) =>
+        link.getAttribute('href'),
+      );
+
+      expect(links).toEqual(['/', '/events', '/contact-us', '/privacy-policy']);
+      expect(links).not.toContain('/categories');
+      expect(links).not.toContain('/about');
     });
   });
 
@@ -133,7 +160,7 @@ describe('Header Component', () => {
       await user.click(hamburger);
       expect(mobileDialog).toHaveClass('mobileNavOpen');
 
-      const categoryNav = screen.getByRole('navigation', {
+      const categoryNav = screen.getByRole('region', {
         name: /event categories/i,
         hidden: true,
       });
