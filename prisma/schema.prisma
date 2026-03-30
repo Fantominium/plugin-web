@@ -1,0 +1,35 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  organizer
+  admin
+}
+
+model UserAccount {
+  id               String   @id @default(uuid())
+  email            String   @unique
+  role             UserRole @default(organizer)
+  isAllowlistedAdmin Boolean @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  organizerProfile OrganizerProfile?
+}
+
+model OrganizerProfile {
+  id            String   @id @default(uuid())
+  userAccountId String   @unique
+  contactEmail  String
+  displayName   String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  userAccount UserAccount @relation(fields: [userAccountId], references: [id], onDelete: Cascade)
+}

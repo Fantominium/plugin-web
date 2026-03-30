@@ -1,5 +1,7 @@
+import Link from 'next/link';
 import EventDetails from '@/app/components/EventDetails/EventDetails';
 import { fetchEventById } from '@/app/lib/event-service';
+import { PUBLIC_ROUTES } from '@/app/lib/public-routes';
 
 interface EventModalPageProps {
   params: Promise<{
@@ -23,27 +25,18 @@ export default async function EventModalPage({ params }: EventModalPageProps) {
       <dialog
         open
         aria-modal="true"
-        style={{
-          position: 'fixed',
-          inset: 0,
-          background: 'rgba(0, 0, 0, 0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 100,
-        }}
+        aria-label="Event unavailable"
+        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4"
       >
-        <div
-          style={{
-            background: 'white',
-            padding: '40px',
-            borderRadius: '12px',
-            textAlign: 'center',
-            maxWidth: '400px',
-          }}
-        >
-          <h2>Event Not Found</h2>
-          <p>We couldn&apos;t load the details for this event.</p>
+        <div className="w-full max-w-md rounded-2xl bg-white p-8 text-center">
+          <h2 className="text-2xl font-semibold text-[#1a1a2e]">Event Not Found</h2>
+          <p className="mt-3 text-[#495057]">We couldn&apos;t load the details for this event.</p>
+          <Link
+            href={PUBLIC_ROUTES.events}
+            className="mt-6 inline-block rounded-full bg-[#1a1a2e] px-5 py-2 font-semibold text-white"
+          >
+            Back to Events
+          </Link>
         </div>
       </dialog>
     );

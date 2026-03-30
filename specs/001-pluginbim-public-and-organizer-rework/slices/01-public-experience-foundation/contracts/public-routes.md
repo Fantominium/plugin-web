@@ -21,6 +21,31 @@ Define the public route and navigation expectations introduced or preserved by s
 - Keyboard-only users must be able to traverse changed public navigation without hidden focus or broken route transitions.
 - Approved external social links must clearly communicate destination purpose before activation.
 
+## Implemented Navigation Examples
+
+### Header (mobile dialog)
+
+- `Home` -> `/`
+- `Events` -> `/events`
+- `Contact Us` -> `/contact-us`
+- `Privacy Policy` -> `/privacy-policy`
+
+### Footer
+
+- `Home` -> `/`
+- `Events` -> `/events`
+- `Contact Us` -> `/contact-us`
+- `Privacy Policy` -> `/privacy-policy`
+- `Terms & Conditions` -> `/terms-and-conditions`
+
+### Homepage discovery fallback
+
+- Featured-events empty state CTA `Browse all events` -> `/events`
+
+### Intercepted event detail fallback
+
+- When `/events/[id]` cannot be loaded in the modal intercept route, the fallback action `Back to Events` navigates to `/events`
+
 ## Content Expectations
 
 - Contact Us content is sourced from versioned typed configuration within the repository for this slice.

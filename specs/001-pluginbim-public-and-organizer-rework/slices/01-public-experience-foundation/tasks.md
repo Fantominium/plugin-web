@@ -11,9 +11,9 @@
 
 **Purpose**: Establish slice-local implementation and evidence files shared across all story work.
 
-- [ ] T001 Create slice implementation evidence log in specs/001-pluginbim-public-and-organizer-rework/slices/01-public-experience-foundation/analysis.md
-- [ ] T002 [P] Create shared public UI types in app/types/public-content.ts
-- [ ] T003 [P] Create shared public content dataset, including approved contact profile content, homepage empty-state content, and optional social-link fallback rules, in app/lib/public-content.ts
+- [X] T001 Create slice implementation evidence log in specs/001-pluginbim-public-and-organizer-rework/slices/01-public-experience-foundation/analysis.md
+- [X] T002 [P] Create shared public UI types in app/types/public-content.ts
+- [X] T003 [P] Create shared public content dataset, including approved contact profile content, homepage empty-state content, and optional social-link fallback rules, in app/lib/public-content.ts
 
 ---
 
@@ -23,11 +23,11 @@
 
 **⚠️ CRITICAL**: No user story work should begin until this phase is complete.
 
-- [ ] T004 [P] Add unit tests for typed public content fallback behavior in app/lib/public-content.test.ts
-- [ ] T005 [P] Add unit tests for public route constants and validation helpers in app/lib/public-routes.test.ts
-- [ ] T006 Create public route constants and validation helpers in app/lib/public-routes.ts
-- [ ] T007 [P] Update shared public shell landmarks and metadata wiring in app/layout.tsx
-- [ ] T008 [P] Create manual accessibility, contrast, responsive, regression, semantic-landmark, heading-order, accessible-name, and announcement-verification checklist in specs/001-pluginbim-public-and-organizer-rework/slices/01-public-experience-foundation/checklists/validation.md
+- [X] T004 [P] Add unit tests for typed public content fallback behavior in app/lib/public-content.test.ts
+- [X] T005 [P] Add unit tests for public route constants and validation helpers in app/lib/public-routes.test.ts
+- [X] T006 Create public route constants and validation helpers in app/lib/public-routes.ts
+- [X] T007 [P] Update shared public shell landmarks and metadata wiring in app/layout.tsx
+- [X] T008 [P] Create manual accessibility, contrast, responsive, regression, semantic-landmark, heading-order, accessible-name, and announcement-verification checklist in specs/001-pluginbim-public-and-organizer-rework/slices/01-public-experience-foundation/checklists/validation.md
 
 **Checkpoint**: Shared public shell, route helpers, typed content tests, and validation artifacts are ready.
 
@@ -41,16 +41,16 @@
 
 ### Tests for User Story 1
 
-- [ ] T009 [P] [US1] Add homepage composition regression tests in app/page.test.tsx
-- [ ] T010 [P] [US1] Add featured discovery and empty-state integration tests in app/components/FeaturedEvents/FeaturedEvents.test.tsx
+- [X] T009 [P] [US1] Add homepage composition regression tests in app/page.test.tsx
+- [X] T010 [P] [US1] Add featured discovery and empty-state integration tests in app/components/FeaturedEvents/FeaturedEvents.test.tsx
 
 ### Implementation for User Story 1
 
-- [ ] T011 [P] [US1] Refactor homepage hero content and CTA behavior in app/components/Hero/Hero.tsx
-- [ ] T012 [P] [US1] Update app promotion supporting content in app/components/AppPromotion/AppPromotion.tsx
-- [ ] T013 [P] [US1] Update categories discovery section in app/components/Categories/Categories.tsx
-- [ ] T014 [P] [US1] Update featured event summaries, empty-state messaging, and fallback CTA behavior in app/components/FeaturedEvents/FeaturedEvents.tsx
-- [ ] T015 [US1] Recompose homepage sections and discovery entry points in app/page.tsx
+- [X] T011 [P] [US1] Refactor homepage hero content and CTA behavior in app/components/Hero/Hero.tsx
+- [X] T012 [P] [US1] Update app promotion supporting content in app/components/AppPromotion/AppPromotion.tsx
+- [X] T013 [P] [US1] Update categories discovery section in app/components/Categories/Categories.tsx
+- [X] T014 [P] [US1] Update featured event summaries, empty-state messaging, and fallback CTA behavior in app/components/FeaturedEvents/FeaturedEvents.tsx
+- [X] T015 [US1] Recompose homepage sections and discovery entry points in app/page.tsx
 
 **Checkpoint**: The homepage is independently functional, understandable, and routes visitors into valid discovery paths.
 
@@ -64,14 +64,14 @@
 
 ### Tests for User Story 2
 
-- [ ] T016 [P] [US2] Add Contact Us page rendering tests for full, partial, and no-social-link states in app/(pages)/contact-us/page.test.tsx
-- [ ] T017 [P] [US2] Add footer contact and social link tests, including the hidden-social-links state, in app/components/Footer/Footer.test.tsx
+- [X] T016 [P] [US2] Add Contact Us page rendering tests for full, partial, and no-social-link states in app/(pages)/contact-us/page.test.tsx
+- [X] T017 [P] [US2] Add footer contact and social link tests, including the hidden-social-links state, in app/components/Footer/Footer.test.tsx
 
 ### Implementation for User Story 2
 
-- [ ] T018 [P] [US2] Create contact presentation component with optional social-link rendering in app/components/ContactUs/ContactUs.tsx
-- [ ] T019 [US2] Add Contact Us route in app/(pages)/contact-us/page.tsx
-- [ ] T020 [US2] Replace footer placeholder with contact and social navigation in app/components/Footer/Footer.tsx
+- [X] T018 [P] [US2] Create contact presentation component with optional social-link rendering in app/components/ContactUs/ContactUs.tsx
+- [X] T019 [US2] Add Contact Us route in app/(pages)/contact-us/page.tsx
+- [X] T020 [US2] Replace footer placeholder with contact and social navigation in app/components/Footer/Footer.tsx
 
 **Checkpoint**: Contact Us is independently reachable, complete, and accessible.
 
@@ -85,18 +85,18 @@
 
 ### Tests for User Story 3
 
-- [ ] T021 [P] [US3] Extend header navigation regression tests in app/components/Header/Header.test.tsx
-- [ ] T022 [P] [US3] Add shell-level navigation integration tests covering homepage, header, and footer journeys to Contact Us and Events in app/layout.test.tsx
-- [ ] T023 [P] [US3] Add intercepted event modal/detail regression tests in app/@modal/(.)events/[id]/page.test.tsx
-- [ ] T024 [P] [US3] Add public events route and homepage fallback-entry regression tests in app/(pages)/events/page.test.tsx
+- [X] T021 [P] [US3] Extend header navigation regression tests in app/components/Header/Header.test.tsx
+- [X] T022 [P] [US3] Add shell-level navigation integration tests covering homepage, header, and footer journeys to Contact Us and Events in app/layout.test.tsx
+- [X] T023 [P] [US3] Add intercepted event modal/detail regression tests in app/@modal/(.)events/[id]/page.test.tsx
+- [X] T024 [P] [US3] Add public events route and homepage fallback-entry regression tests in app/(pages)/events/page.test.tsx
 
 ### Implementation for User Story 3
 
-- [ ] T025 [P] [US3] Update header navigation and mobile menu destinations in app/components/Header/Header.tsx
-- [ ] T026 [P] [US3] Implement placeholder-free public events route content in app/(pages)/events/page.tsx
-- [ ] T027 [US3] Align intercepted event modal route behavior with updated public navigation in app/@modal/(.)events/[id]/page.tsx
-- [ ] T028 [US3] Record keyboard, focus, semantic-structure, accessible-name, contrast, and announcement verification evidence in specs/001-pluginbim-public-and-organizer-rework/slices/01-public-experience-foundation/analysis.md
-- [ ] T029 [US3] Sync route contract examples with implemented navigation in specs/001-pluginbim-public-and-organizer-rework/slices/01-public-experience-foundation/contracts/public-routes.md
+- [X] T025 [P] [US3] Update header navigation and mobile menu destinations in app/components/Header/Header.tsx
+- [X] T026 [P] [US3] Implement placeholder-free public events route content in app/(pages)/events/page.tsx
+- [X] T027 [US3] Align intercepted event modal route behavior with updated public navigation in app/@modal/(.)events/[id]/page.tsx
+- [X] T028 [US3] Record keyboard, focus, semantic-structure, accessible-name, contrast, and announcement verification evidence in specs/001-pluginbim-public-and-organizer-rework/slices/01-public-experience-foundation/analysis.md
+- [X] T029 [US3] Sync route contract examples with implemented navigation in specs/001-pluginbim-public-and-organizer-rework/slices/01-public-experience-foundation/contracts/public-routes.md
 
 **Checkpoint**: Public navigation is valid, shell-integrated, keyboard-verifiable, regression-safe across changed routes, and preserves the modal/detail discovery path.
 
@@ -106,10 +106,10 @@
 
 **Purpose**: Final evidence capture and cross-story cleanup.
 
-- [ ] T030 [P] Update slice validation and implementation notes in specs/001-pluginbim-public-and-organizer-rework/slices/01-public-experience-foundation/quickstart.md
-- [ ] T031 [P] Capture final regression, accessibility, contrast, responsive viewport, semantic-structure review, accessible-name review, announcement verification, and stakeholder sign-off in specs/001-pluginbim-public-and-organizer-rework/slices/01-public-experience-foundation/analysis.md
-- [ ] T032 [P] Record homepage and Contact Us performance evidence against the 2.5-second heading-and-first-action budget in specs/001-pluginbim-public-and-organizer-rework/slices/01-public-experience-foundation/analysis.md
-- [ ] T033 Validate delivered scope against the readiness checklist in specs/001-pluginbim-public-and-organizer-rework/slices/01-public-experience-foundation/checklists/requirements.md
+- [X] T030 [P] Update slice validation and implementation notes in specs/001-pluginbim-public-and-organizer-rework/slices/01-public-experience-foundation/quickstart.md
+- [X] T031 [P] Capture final regression, accessibility, contrast, responsive viewport, semantic-structure review, accessible-name review, announcement verification, and stakeholder sign-off in specs/001-pluginbim-public-and-organizer-rework/slices/01-public-experience-foundation/analysis.md
+- [X] T032 [P] Record homepage and Contact Us performance evidence against the 2.5-second heading-and-first-action budget in specs/001-pluginbim-public-and-organizer-rework/slices/01-public-experience-foundation/analysis.md
+- [X] T033 Validate delivered scope against the readiness checklist in specs/001-pluginbim-public-and-organizer-rework/slices/01-public-experience-foundation/checklists/requirements.md
 
 ---
 

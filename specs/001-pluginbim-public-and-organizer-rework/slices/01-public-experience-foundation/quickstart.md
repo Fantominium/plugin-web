@@ -28,3 +28,17 @@ Implement the public homepage refresh, Contact Us route, and public navigation v
 - Automated `P3 End-to-End` and `P5 Accessibility` evidence are planned dependencies on slice 07 unless equivalent tooling enablement is delivered separately.
 - Contact Us content and homepage empty-state behavior are intentionally sourced from versioned typed repository configuration rather than environment variables or backend fetches.
 - Security, contract, and migration validation remain `N/A` for this slice unless implementation expands beyond the approved scope.
+
+## Phase 6 Validation Snapshot (2026-03-30)
+
+Executed commands and outcomes:
+
+1. `yarn lint` -> PASS
+2. `yarn typecheck` -> PASS
+3. `yarn test:ci` -> PASS (21 suites, 340 tests)
+4. `yarn build` -> PASS
+5. `yarn test --runTestsByPath app/lib/public-content.test.ts app/lib/public-routes.test.ts` -> PASS
+6. `npx --yes @biomejs/biome check .` -> PASS (no error/warning findings; only schema-version informational notice in `biome.json`)
+7. `yarn audit --level high` -> FAIL (high-severity advisory chains involving `picomatch` and `minimatch` in transitive dependencies)
+
+Performance evidence was recorded using a production server (`yarn start`) and repeated page fetch timing checks for `/` and `/contact-us`; details are captured in `analysis.md`.
