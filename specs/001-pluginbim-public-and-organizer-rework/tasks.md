@@ -11,11 +11,11 @@
 
 **Purpose**: Establish repository-level tooling, runtime assets, and validation scaffolding shared by all slices.
 
-- [ ] T001 Update Prisma, Auth.js, Playwright, axe, Lighthouse, Redocly, and supporting scripts in package.json
-- [ ] T002 Create application container and local orchestration assets in Dockerfile, docker-compose.yml, and .dockerignore
-- [ ] T003 [P] Add environment variable templates and runtime documentation in .env.example and README.md
-- [ ] T004 [P] Scaffold Prisma project files in prisma/schema.prisma and prisma/seed.ts
-- [ ] T005 [P] Add repo-level tooling configuration in playwright.config.ts, lighthouserc.json, and redocly.yaml
+- [X] T001 Update Prisma, Auth.js, Playwright, axe, Lighthouse, Redocly, and supporting scripts in package.json
+- [X] T002 Create application container and local orchestration assets in Dockerfile, docker-compose.yml, and .dockerignore
+- [X] T003 [P] Add environment variable templates and runtime documentation in .env.example and README.md
+- [X] T004 [P] Scaffold Prisma project files in prisma/schema.prisma and prisma/seed.ts
+- [X] T005 [P] Add repo-level tooling configuration in playwright.config.ts, lighthouserc.json, and redocly.yaml
 
 ---
 
@@ -25,19 +25,19 @@
 
 **⚠️ CRITICAL**: No user story work should begin until this phase is complete.
 
-- [ ] T006 Implement shared environment parsing in app/config/env.ts
-- [ ] T007 [P] Implement Prisma client and repository bootstrap in app/lib/prisma.ts and app/lib/repositories/index.ts
-- [ ] T008 [P] Implement shared API error and response helpers in app/lib/api/errors.ts and app/types/api.ts
-- [ ] T009 [P] Implement shared validation and normalization utilities in app/lib/validation/common.ts and app/lib/validation/event.ts
-- [ ] T010 [P] Add controlled configuration datasets in app/config/locations.ts and app/config/admin-allowlist.ts
-- [ ] T011 [P] Create repository contract validation wiring by syncing specs/001-pluginbim-public-and-organizer-rework/contracts/openapi-v1.yaml to contracts/openapi.yaml and wiring validation in package.json
-- [ ] T012 [P] Enable quality-gate automation wiring in .github/workflows/quality-gates.yml and scripts/quality-gates/ci.sh
-- [ ] T013 Create foundational auth and organizer schema models in prisma/schema.prisma
-- [ ] T014 Create foundational Prisma migration for auth and organizer tables in prisma/migrations/
-- [ ] T015 [P] Implement cross-cutting poster storage and notification abstractions in app/lib/storage/poster-storage.ts and app/lib/notifications/notification-service.ts
-- [ ] T016 [P] Add runtime health and migration validation support in app/api/health/route.ts and scripts/quality-gates/validate-postgres-migrations.sh
-- [ ] T082 [P] Implement shared network security configuration for CORS, request timeouts, and abuse-control defaults in app/config/security.ts and app/lib/api/security.ts
-- [ ] T083 [P] Implement server-side CSRF/session-integrity helpers for authenticated mutations in app/lib/auth/csrf.ts and app/lib/auth/session.ts
+- [X] T006 Implement shared environment parsing in app/config/env.ts
+- [X] T007 [P] Implement Prisma client and repository bootstrap in app/lib/prisma.ts and app/lib/repositories/index.ts
+- [X] T008 [P] Implement shared API error and response helpers in app/lib/api/errors.ts and app/types/api.ts
+- [X] T009 [P] Implement shared validation and normalization utilities in app/lib/validation/common.ts and app/lib/validation/event.ts
+- [X] T010 [P] Add controlled configuration datasets in app/config/locations.ts and app/config/admin-allowlist.ts
+- [X] T011 [P] Create repository contract validation wiring by syncing specs/001-pluginbim-public-and-organizer-rework/contracts/openapi-v1.yaml to contracts/openapi.yaml and wiring validation in package.json
+- [X] T012 [P] Enable quality-gate automation wiring in .github/workflows/quality-gates.yml and scripts/quality-gates/ci.sh
+- [X] T013 Create foundational auth and organizer schema models in prisma/schema.prisma
+- [X] T014 Create foundational Prisma migration for auth and organizer tables in prisma/migrations/
+- [X] T015 [P] Implement cross-cutting poster storage and notification abstractions in app/lib/storage/poster-storage.ts and app/lib/notifications/notification-service.ts
+- [X] T016 [P] Add runtime health and migration validation support in app/api/health/route.ts and scripts/quality-gates/validate-postgres-migrations.sh
+- [X] T082 [P] Implement shared network security configuration for CORS, request timeouts, and abuse-control defaults in app/config/security.ts and app/lib/api/security.ts
+- [X] T083 [P] Implement server-side CSRF/session-integrity helpers for authenticated mutations in app/lib/auth/csrf.ts and app/lib/auth/session.ts
 
 **Checkpoint**: Shared runtime, Prisma baseline, contract scaffolding, and automation foundations are ready.
 
@@ -51,17 +51,17 @@
 
 ### Tests for User Story 1
 
-- [ ] T017 [P] [US1] Add homepage integration coverage in app/page.test.tsx
-- [ ] T018 [P] [US1] Add homepage E2E and accessibility coverage in e2e/public/homepage.spec.ts and e2e/public/homepage.a11y.spec.ts
-- [ ] T019 [P] [US1] Add regression coverage for public event discovery navigation in app/(pages)/events/page.test.tsx
+- [X] T017 [P] [US1] Add homepage integration coverage in app/page.test.tsx
+- [X] T018 [P] [US1] Add homepage E2E and accessibility coverage in e2e/public/homepage.spec.ts and e2e/public/homepage.a11y.spec.ts
+- [X] T019 [P] [US1] Add regression coverage for public event discovery navigation in app/(pages)/events/page.test.tsx
 
 ### Implementation for User Story 1
 
-- [ ] T020 [P] [US1] Rework homepage composition and data loading in app/page.tsx
-- [ ] T021 [P] [US1] Refresh public navigation structure in app/components/Header/Header.tsx
-- [ ] T022 [P] [US1] Refresh footer navigation and legal/public links in app/components/Footer/Footer.tsx
-- [ ] T023 [P] [US1] Implement homepage feature sections in app/components/Hero/Hero.tsx, app/components/Categories/Categories.tsx, app/components/FeaturedEvents/FeaturedEvents.tsx, and app/components/AppPromotion/AppPromotion.tsx
-- [ ] T024 [US1] Wire homepage event discovery data through app/lib/event-service.ts and app/types/event.ts
+- [X] T020 [P] [US1] Rework homepage composition and data loading in app/page.tsx
+- [X] T021 [P] [US1] Refresh public navigation structure in app/components/Header/Header.tsx
+- [X] T022 [P] [US1] Refresh footer navigation and legal/public links in app/components/Footer/Footer.tsx
+- [X] T023 [P] [US1] Implement homepage feature sections in app/components/Hero/Hero.tsx, app/components/Categories/Categories.tsx, app/components/FeaturedEvents/FeaturedEvents.tsx, and app/components/AppPromotion/AppPromotion.tsx
+- [X] T024 [US1] Wire homepage event discovery data through app/lib/event-service.ts and app/types/event.ts
 
 **Checkpoint**: User Story 1 is independently functional and testable.
 
@@ -75,14 +75,14 @@
 
 ### Tests for User Story 2
 
-- [ ] T025 [P] [US2] Add Contact Us route integration coverage in app/(pages)/contact/page.test.tsx
-- [ ] T026 [P] [US2] Add Contact Us E2E and accessibility coverage in e2e/public/contact.spec.ts and e2e/public/contact.a11y.spec.ts
+- [X] T025 [P] [US2] Add Contact Us route integration coverage in app/(pages)/contact/page.test.tsx
+- [X] T026 [P] [US2] Add Contact Us E2E and accessibility coverage in e2e/public/contact.spec.ts and e2e/public/contact.a11y.spec.ts
 
 ### Implementation for User Story 2
 
-- [ ] T027 [P] [US2] Add public contact configuration in app/config/public-contact.ts
-- [ ] T028 [US2] Implement the Contact Us route in app/(pages)/contact/page.tsx
-- [ ] T029 [US2] Link Contact Us into public navigation in app/components/Header/Header.tsx and app/components/Footer/Footer.tsx
+- [X] T027 [P] [US2] Add public contact configuration in app/config/public-contact.ts
+- [X] T028 [US2] Implement the Contact Us route in app/(pages)/contact/page.tsx
+- [X] T029 [US2] Link Contact Us into public navigation in app/components/Header/Header.tsx and app/components/Footer/Footer.tsx
 
 **Checkpoint**: User Story 2 is independently functional and testable.
 
@@ -96,19 +96,19 @@
 
 ### Tests for User Story 3
 
-- [ ] T030 [P] [US3] Add auth unit coverage for allowlist and magic-link rules in app/lib/auth/auth.test.ts and app/lib/auth/authorize.test.ts
-- [ ] T031 [P] [US3] Add auth contract and route validation coverage in specs/001-pluginbim-public-and-organizer-rework/contracts/openapi-v1.yaml, contracts/openapi.yaml, and app/api/v1/auth/magic-link/route.test.ts
-- [ ] T032 [P] [US3] Add organizer/admin sign-in E2E coverage in e2e/auth/login.spec.ts
-- [ ] T033 [P] [US3] Add protected-route authorization regression coverage in app/middleware.test.ts
-- [ ] T084 [P] [US3] Add timeout, replay, CSRF/session-integrity, and abuse-control validation coverage for auth flows in app/api/v1/auth/magic-link/route.test.ts and app/lib/auth/auth.test.ts
+- [X] T030 [P] [US3] Add auth unit coverage for allowlist and magic-link rules in app/lib/auth/auth.test.ts and app/lib/auth/authorize.test.ts
+- [X] T031 [P] [US3] Add auth contract and route validation coverage in specs/001-pluginbim-public-and-organizer-rework/contracts/openapi-v1.yaml, contracts/openapi.yaml, and app/api/v1/auth/magic-link/route.test.ts
+- [X] T032 [P] [US3] Add organizer/admin sign-in E2E coverage in e2e/auth/login.spec.ts
+- [X] T033 [P] [US3] Add protected-route authorization regression coverage in app/middleware.test.ts
+- [X] T084 [P] [US3] Add timeout, replay, CSRF/session-integrity, and abuse-control validation coverage for auth flows in app/api/v1/auth/magic-link/route.test.ts and app/lib/auth/auth.test.ts
 
 ### Implementation for User Story 3
 
-- [ ] T034 [P] [US3] Implement Auth.js configuration and session callbacks in app/lib/auth/auth.ts and app/api/auth/[...nextauth]/route.ts
-- [ ] T035 [P] [US3] Implement allowlist-based role resolution in app/lib/auth/authorize.ts and app/config/admin-allowlist.ts
-- [ ] T036 [P] [US3] Implement magic-link request and verification flow in app/api/v1/auth/magic-link/route.ts and app/lib/auth/magic-link.ts
-- [ ] T037 [US3] Add middleware-based protected routing in middleware.ts and app/lib/auth/session.ts
-- [ ] T038 [US3] Create login and unauthorized UI routes in app/(pages)/login/page.tsx and app/(pages)/unauthorized/page.tsx
+- [X] T034 [P] [US3] Implement Auth.js configuration and session callbacks in app/lib/auth/auth.ts and app/api/auth/[...nextauth]/route.ts
+- [X] T035 [P] [US3] Implement allowlist-based role resolution in app/lib/auth/authorize.ts and app/config/admin-allowlist.ts
+- [X] T036 [P] [US3] Implement magic-link request and verification flow in app/api/v1/auth/magic-link/route.ts and app/lib/auth/magic-link.ts
+- [X] T037 [US3] Add middleware-based protected routing in middleware.ts and app/lib/auth/session.ts
+- [X] T038 [US3] Create login and unauthorized UI routes in app/(pages)/login/page.tsx and app/(pages)/unauthorized/page.tsx
 
 **Checkpoint**: User Story 3 is independently functional and testable.
 

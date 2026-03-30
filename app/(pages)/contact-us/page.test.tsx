@@ -12,11 +12,9 @@ jest.mock('@/app/lib/public-content', () => ({
 
 import { getPublicContactProfile, getSocialLinks, hasSocialLinks } from '@/app/lib/public-content';
 
-const mockGetPublicContactProfile = getPublicContactProfile as jest.MockedFunction<
-  typeof getPublicContactProfile
->;
-const mockHasSocialLinks = hasSocialLinks as jest.MockedFunction<typeof hasSocialLinks>;
-const mockGetSocialLinks = getSocialLinks as jest.MockedFunction<typeof getSocialLinks>;
+const mockGetPublicContactProfile = jest.mocked(getPublicContactProfile);
+const mockHasSocialLinks = jest.mocked(hasSocialLinks);
+const mockGetSocialLinks = jest.mocked(getSocialLinks);
 
 const stubContactProfile = (
   overrides: Partial<PublicContactProfile> = {},
@@ -27,7 +25,7 @@ const stubContactProfile = (
   addressLines: ['Bridgetown', 'Barbados'],
   socialLinks: [],
   supportCopy: 'Have questions about events in Barbados? We would love to hear from you.',
-  source: 'repository-config',
+  source: 'repository-config' as const,
   ...overrides,
 });
 
