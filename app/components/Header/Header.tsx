@@ -17,7 +17,7 @@ const CATEGORY_TABS = [
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('concerts');
-  const firstMobileLinkRef = useRef<HTMLAnchorElement | null>(null);
+  const mobileMenuDialogRef = useRef<HTMLDialogElement | null>(null);
   const hamburgerButtonRef = useRef<HTMLButtonElement | null>(null);
   const wasMobileMenuOpen = useRef(false);
 
@@ -35,19 +35,23 @@ export default function Header() {
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
+    let focusTimeout: ReturnType<typeof setTimeout> | undefined;
 
     if (mobileMenuOpen) {
       document.body.style.overflow = 'hidden';
-      const focusMenu = () => firstMobileLinkRef.current?.focus();
+      const focusMenu = () => {
+        mobileMenuDialogRef.current
+          ?.querySelector<HTMLElement>('[data-mobile-menu-initial-focus="true"]')
+          ?.focus();
+      };
 
-      if (typeof globalThis.requestAnimationFrame === 'function') {
-        globalThis.requestAnimationFrame(focusMenu);
-      } else {
-        setTimeout(focusMenu, 0);
-      }
+      focusTimeout = setTimeout(focusMenu, 50);
     }
 
     return () => {
+      if (focusTimeout) {
+        clearTimeout(focusTimeout);
+      }
       document.body.style.overflow = previousOverflow;
     };
   }, [mobileMenuOpen]);
@@ -125,6 +129,7 @@ export default function Header() {
       {/* Mobile Navigation Menu */}
       <dialog
         id="mobile-menu-dialog"
+        ref={mobileMenuDialogRef}
         aria-modal="true"
         aria-label="Mobile menu"
         open={mobileMenuOpen}
@@ -160,9 +165,9 @@ export default function Header() {
             <li className={styles.mobileNavListItem}>
               <Link
                 href={PUBLIC_ROUTES.home}
+                data-mobile-menu-initial-focus="true"
                 className={styles.mobileNavLink}
                 onClick={closeMobileMenu}
-                ref={firstMobileLinkRef}
               >
                 Home
               </Link>

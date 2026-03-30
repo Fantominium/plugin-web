@@ -3,6 +3,8 @@
  * Validates that protected routes redirect unauthenticated/unauthorized users correctly
  */
 
+import { isValidPublicDestination } from '@/app/lib/public-routes';
+
 // Mock auth module
 jest.mock('@/auth', () => ({
   auth: jest.fn(),
@@ -18,14 +20,6 @@ type TestSession =
   | null
   | { user: undefined };
 describe('Middleware - Route Protection (T033)', () => {
-  const publicRoutes = [
-    '/',
-    '/events',
-    '/contact-us',
-    '/privacy-policy',
-    '/terms-and-conditions',
-    '/login',
-  ];
   const organizerRoutes = [
     '/dashboard',
     '/dashboard/events',
@@ -33,41 +27,37 @@ describe('Middleware - Route Protection (T033)', () => {
     '/dashboard/profile',
   ];
   const adminRoutes = ['/admin', '/admin/moderation', '/admin/users', '/admin/settings'];
+  const matchesRoute = (pathname: string, routes: string[]): boolean => {
+    return routes.some((route) => pathname === route || pathname.startsWith(`${route}/`));
+  };
+  const isPublicPath = (pathname: string): boolean => {
+    return pathname === '/login' || isValidPublicDestination(pathname);
+  };
 
   describe('Public Route Access Logic', () => {
     it('should allow unauthenticated access to home page', () => {
-      const pathname = '/';
-      const isPublic = publicRoutes.some((route) => pathname.startsWith(route));
-      expect(isPublic).toBe(true);
+      expect(isPublicPath('/')).toBe(true);
     });
 
     it('should allow unauthenticated access to /events route', () => {
-      const pathname = '/events';
-      const isPublic = publicRoutes.some((route) => pathname.startsWith(route));
-      expect(isPublic).toBe(true);
+      expect(isPublicPath('/events')).toBe(true);
     });
 
     it('should allow unauthenticated access to /contact-us route', () => {
-      const pathname = '/contact-us';
-      const isPublic = publicRoutes.some((route) => pathname.startsWith(route));
-      expect(isPublic).toBe(true);
+      expect(isPublicPath('/contact-us')).toBe(true);
     });
 
     it('should allow unauthenticated access to legal pages', () => {
-      const privacyPath = '/privacy-policy';
-      const termsPath = '/terms-and-conditions';
-
-      const privacyIsPublic = publicRoutes.some((route) => privacyPath.startsWith(route));
-      const termsIsPublic = publicRoutes.some((route) => termsPath.startsWith(route));
-
-      expect(privacyIsPublic).toBe(true);
-      expect(termsIsPublic).toBe(true);
+      expect(isPublicPath('/privacy-policy')).toBe(true);
+      expect(isPublicPath('/terms-and-conditions')).toBe(true);
     });
 
     it('should allow unauthenticated access to /login page', () => {
-      const pathname = '/login';
-      const isPublic = publicRoutes.some((route) => pathname.startsWith(route));
-      expect(isPublic).toBe(true);
+      expect(isPublicPath('/login')).toBe(true);
+    });
+
+    it('should not treat /dashboard as public because / is public', () => {
+      expect(isPublicPath('/dashboard')).toBe(false);
     });
 
     it('should allow access to /api/auth routes without session check', () => {
@@ -81,7 +71,7 @@ describe('Middleware - Route Protection (T033)', () => {
     it('should protect /dashboard from unauthenticated users', () => {
       const pathname = '/dashboard';
       const session = null;
-      const isOrganizers = organizerRoutes.some((route) => pathname.startsWith(route));
+      const isOrganizers = matchesRoute(pathname, organizerRoutes);
       const isProtected = isOrganizers && !session;
       expect(isProtected).toBe(true);
     });
@@ -89,7 +79,7 @@ describe('Middleware - Route Protection (T033)', () => {
     it('should protect /dashboard/events from unauthenticated users', () => {
       const pathname = '/dashboard/events';
       const session = null;
-      const isOrganizers = organizerRoutes.some((route) => pathname.startsWith(route));
+      const isOrganizers = matchesRoute(pathname, organizerRoutes);
       const isProtected = isOrganizers && !session;
       expect(isProtected).toBe(true);
     });
@@ -97,7 +87,7 @@ describe('Middleware - Route Protection (T033)', () => {
     it('should protect /dashboard/events/new from unauthenticated users', () => {
       const pathname = '/dashboard/events/new';
       const session = null;
-      const isOrganizers = organizerRoutes.some((route) => pathname.startsWith(route));
+      const isOrganizers = matchesRoute(pathname, organizerRoutes);
       const isProtected = isOrganizers && !session;
       expect(isProtected).toBe(true);
     });
@@ -105,7 +95,7 @@ describe('Middleware - Route Protection (T033)', () => {
     it('should allow organizer role access to /dashboard', () => {
       const pathname = '/dashboard';
       const session: TestSession = { user: { email: 'org@example.com', role: 'organizer' } };
-      const isOrganizers = organizerRoutes.some((route) => pathname.startsWith(route));
+      const isOrganizers = matchesRoute(pathname, organizerRoutes);
       const userRole = session?.user?.role;
       const isAuthorized = userRole === 'organizer' || userRole === 'admin';
       expect(isOrganizers && isAuthorized).toBe(true);
@@ -114,7 +104,7 @@ describe('Middleware - Route Protection (T033)', () => {
     it('should allow admin role access to /dashboard', () => {
       const pathname = '/dashboard';
       const session: TestSession = { user: { email: 'admin@example.com', role: 'admin' } };
-      const isOrganizers = organizerRoutes.some((route) => pathname.startsWith(route));
+      const isOrganizers = matchesRoute(pathname, organizerRoutes);
       const userRole = session?.user?.role;
       const isAuthorized = userRole === 'organizer' || userRole === 'admin';
       expect(isOrganizers && isAuthorized).toBe(true);
@@ -123,7 +113,7 @@ describe('Middleware - Route Protection (T033)', () => {
     it('should deny non-organizer/non-admin users from /dashboard', () => {
       const pathname = '/dashboard';
       const session: TestSession = { user: { email: 'user@example.com', role: 'public' } };
-      const isOrganizers = organizerRoutes.some((route) => pathname.startsWith(route));
+      const isOrganizers = matchesRoute(pathname, organizerRoutes);
       const userRole = session?.user?.role;
       const isAuthorized = userRole === 'organizer' || userRole === 'admin';
       expect(isOrganizers && !isAuthorized).toBe(true);
@@ -134,7 +124,7 @@ describe('Middleware - Route Protection (T033)', () => {
     it('should protect /admin from unauthenticated users', () => {
       const pathname = '/admin';
       const session = null;
-      const isAdmin = adminRoutes.some((route) => pathname.startsWith(route));
+      const isAdmin = matchesRoute(pathname, adminRoutes);
       const isProtected = isAdmin && !session;
       expect(isProtected).toBe(true);
     });
@@ -142,7 +132,7 @@ describe('Middleware - Route Protection (T033)', () => {
     it('should allow admin role access to /admin panel', () => {
       const pathname = '/admin';
       const session: TestSession = { user: { email: 'admin@example.com', role: 'admin' } };
-      const isAdmin = adminRoutes.some((route) => pathname.startsWith(route));
+      const isAdmin = matchesRoute(pathname, adminRoutes);
       const userRole = session?.user?.role;
       const isAuthorized = userRole === 'admin';
       expect(isAdmin && isAuthorized).toBe(true);
@@ -151,7 +141,7 @@ describe('Middleware - Route Protection (T033)', () => {
     it('should deny organizer role access to /admin panel', () => {
       const pathname = '/admin';
       const session: TestSession = { user: { email: 'org@example.com', role: 'organizer' } };
-      const isAdmin = adminRoutes.some((route) => pathname.startsWith(route));
+      const isAdmin = matchesRoute(pathname, adminRoutes);
       const userRole = session?.user?.role;
       const isAuthorized = userRole === 'admin';
       expect(isAdmin && !isAuthorized).toBe(true);
@@ -160,7 +150,7 @@ describe('Middleware - Route Protection (T033)', () => {
     it('should deny public user access to /admin panel', () => {
       const pathname = '/admin';
       const session: TestSession = { user: { email: 'user@example.com', role: 'public' } };
-      const isAdmin = adminRoutes.some((route) => pathname.startsWith(route));
+      const isAdmin = matchesRoute(pathname, adminRoutes);
       const userRole = session?.user?.role;
       const isAuthorized = userRole === 'admin';
       expect(isAdmin && !isAuthorized).toBe(true);
@@ -170,7 +160,7 @@ describe('Middleware - Route Protection (T033)', () => {
       const testRoutes = ['/admin/moderation', '/admin/users', '/admin/settings'];
 
       for (const route of testRoutes) {
-        const isAdmin = adminRoutes.some((adminRoute) => route.startsWith(adminRoute));
+        const isAdmin = matchesRoute(route, adminRoutes);
         expect(isAdmin).toBe(true);
       }
     });
@@ -180,7 +170,7 @@ describe('Middleware - Route Protection (T033)', () => {
     it('should prevent privilege escalation: non-admin cannot access /admin/users', () => {
       const pathname = '/admin/users';
       const session: TestSession = { user: { email: 'org@example.com', role: 'organizer' } };
-      const isAdmin = adminRoutes.some((route) => pathname.startsWith(route));
+      const isAdmin = matchesRoute(pathname, adminRoutes);
       const userRole = session?.user?.role;
       const isAuthorized = userRole === 'admin';
       expect(isAdmin && !isAuthorized).toBe(true);
@@ -189,7 +179,7 @@ describe('Middleware - Route Protection (T033)', () => {
     it('should enforce allow-path: admin can access /dashboard', () => {
       const pathname = '/dashboard';
       const session: TestSession = { user: { email: 'admin@example.com', role: 'admin' } };
-      const isOrganizers = organizerRoutes.some((route) => pathname.startsWith(route));
+      const isOrganizers = matchesRoute(pathname, organizerRoutes);
       const userRole = session?.user?.role;
       // Admin should have super-user access
       const isAuthorized = userRole === 'admin' || userRole === 'organizer';
@@ -201,8 +191,8 @@ describe('Middleware - Route Protection (T033)', () => {
       const session = null;
 
       for (const route of protectedRoutes) {
-        const isOrganizers = organizerRoutes.some((orgRoute) => route.startsWith(orgRoute));
-        const isAdmin = adminRoutes.some((adminRoute) => route.startsWith(adminRoute));
+        const isOrganizers = matchesRoute(route, organizerRoutes);
+        const isAdmin = matchesRoute(route, adminRoutes);
         const isProtected = (isOrganizers || isAdmin) && !session;
         expect(isProtected).toBe(true);
       }
@@ -231,7 +221,7 @@ describe('Middleware - Route Protection (T033)', () => {
   describe('HTTP Methods', () => {
     it('should protect GET requests to dashboard', () => {
       const pathname = '/dashboard';
-      const isOrganizers = organizerRoutes.some((route) => pathname.startsWith(route));
+      const isOrganizers = matchesRoute(pathname, organizerRoutes);
       const session = null;
       const isProtected = isOrganizers && !session;
       expect(isProtected).toBe(true);
@@ -239,7 +229,7 @@ describe('Middleware - Route Protection (T033)', () => {
 
     it('should protect POST requests to dashboard', () => {
       const pathname = '/dashboard';
-      const isOrganizers = organizerRoutes.some((route) => pathname.startsWith(route));
+      const isOrganizers = matchesRoute(pathname, organizerRoutes);
       const session = null;
       const isProtected = isOrganizers && !session;
       expect(isProtected).toBe(true);
@@ -247,7 +237,7 @@ describe('Middleware - Route Protection (T033)', () => {
 
     it('should protect PUT requests to admin routes', () => {
       const pathname = '/admin/users/123';
-      const isAdmin = adminRoutes.some((route) => pathname.startsWith(route));
+      const isAdmin = matchesRoute(pathname, adminRoutes);
       const session = null;
       const isProtected = isAdmin && !session;
       expect(isProtected).toBe(true);
@@ -255,15 +245,6 @@ describe('Middleware - Route Protection (T033)', () => {
   });
 
   describe('Route Matching Logic', () => {
-    // Helper to match routes accurately (must be exact match or have path separator after)
-    const matchesRoute = (pathname: string, routes: string[]): boolean => {
-      return routes.some((route) => {
-        if (pathname === route) return true;
-        if (pathname.startsWith(`${route}/`)) return true;
-        return false;
-      });
-    };
-
     it('should correctly match /dashboard as protected route', () => {
       const pathname = '/dashboard';
       const matches = matchesRoute(pathname, organizerRoutes);

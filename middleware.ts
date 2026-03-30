@@ -6,6 +6,7 @@
 
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
+import { isValidPublicDestination } from '@/app/lib/public-routes';
 import { auth } from '@/auth';
 
 /**
@@ -25,17 +26,13 @@ const organizerRoutes = [
  */
 const adminRoutes = ['/admin', '/admin/moderation', '/admin/users', '/admin/settings'];
 
-/**
- * Public routes (no authentication required)
- */
-const publicRoutes = [
-  '/',
-  '/events',
-  '/contact-us',
-  '/privacy-policy',
-  '/terms-and-conditions',
-  '/login',
-];
+function matchesRoute(pathname: string, routes: readonly string[]) {
+  return routes.some((route) => pathname === route || pathname.startsWith(`${route}/`));
+}
+
+function isPublicPath(pathname: string) {
+  return pathname === '/login' || isValidPublicDestination(pathname);
+}
 
 /**
  * Middleware function for route protection
@@ -44,7 +41,7 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Allow public routes without authentication
-  if (publicRoutes.some((route) => pathname.startsWith(route))) {
+  if (isPublicPath(pathname)) {
     return NextResponse.next();
   }
 
@@ -58,13 +55,13 @@ export async function middleware(request: NextRequest) {
 
   // Redirect unauthenticated users to login
   if (!session) {
-    if (organizerRoutes.some((route) => pathname.startsWith(route))) {
+    if (matchesRoute(pathname, organizerRoutes)) {
       return NextResponse.redirect(
         new URL(`/login?callbackUrl=${encodeURIComponent(pathname)}`, request.url),
       );
     }
 
-    if (adminRoutes.some((route) => pathname.startsWith(route))) {
+    if (matchesRoute(pathname, adminRoutes)) {
       return NextResponse.redirect(
         new URL(`/login?callbackUrl=${encodeURIComponent(pathname)}`, request.url),
       );
@@ -77,7 +74,7 @@ export async function middleware(request: NextRequest) {
   const userRole = (session.user as { role?: string } | undefined)?.role;
 
   // Check organizer dashboard access
-  if (organizerRoutes.some((route) => pathname.startsWith(route))) {
+  if (matchesRoute(pathname, organizerRoutes)) {
     const isAuthorized = userRole === 'organizer' || userRole === 'admin';
 
     if (!isAuthorized) {
@@ -88,7 +85,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Check admin panel access
-  if (adminRoutes.some((route) => pathname.startsWith(route))) {
+  if (matchesRoute(pathname, adminRoutes)) {
     const isAuthorized = userRole === 'admin';
 
     if (!isAuthorized) {
@@ -115,6 +112,6 @@ export const config = {
      * - favicon.ico, sitemap.xml, robots.txt (public files)
      * - _vercel (Vercel internals)
      */
-    '/((?!_next|static|favicon\\.ico|sitemap\\.xml|robots\\.txt|_vercel).*)',
+    String.raw`/((?!_next|static|favicon\.ico|sitemap\.xml|robots\.txt|_vercel).*)`,
   ],
 };

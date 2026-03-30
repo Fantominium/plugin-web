@@ -2,6 +2,5 @@ apis:
   plugin-web-v1:
     root: ./contracts/openapi.yaml
 
-lint:
-  extends:
-    - recommended
+extends:
+  - recommended

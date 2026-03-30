@@ -240,7 +240,7 @@
 
 - [ ] T075 [P] Update implementation and runtime documentation in README.md and DEVELOPER_GUIDE.md
 - [ ] T076 [P] Add performance evidence scenarios for homepage, organizer dashboard, admin moderation, organizer submission acknowledgement, upload-feedback latency, and public search/filter responsiveness in e2e/performance/homepage.performance.spec.ts, e2e/performance/dashboard.performance.spec.ts, e2e/performance/admin.performance.spec.ts, and e2e/performance/event-workflows.performance.spec.ts
-- [ ] T077 [P] Finalize contract sync and validation wiring in package.json and scripts/quality-gates/validate-contracts.sh so contracts/openapi.yaml is validated from specs/001-pluginbim-public-and-organizer-rework/contracts/openapi-v1.yaml
+- [X] T077 [P] Finalize contract sync and validation wiring in package.json and scripts/quality-gates/validate-contracts.sh so contracts/openapi.yaml is validated from specs/001-pluginbim-public-and-organizer-rework/contracts/openapi-v1.yaml
 - [ ] T078 [P] Finalize container security and CI gate integration in .github/workflows/quality-gates.yml and sonar-project.properties
 - [ ] T079 Validate quickstart and full gate execution guidance in specs/001-pluginbim-public-and-organizer-rework/quickstart.md and scripts/quality-gates/ci.sh
 - [ ] T080 [P] Record manual keyboard and focus verification evidence for changed public, organizer, and admin flows in specs/001-pluginbim-public-and-organizer-rework/quickstart.md and QUALITY_GATES.md

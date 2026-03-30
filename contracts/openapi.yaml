@@ -10,6 +10,7 @@ servers:
 paths:
   /api/v1/public/events:
     get:
+      security: []
       summary: List published public events
       tags: [PublicEvents]
       responses:
@@ -27,6 +28,7 @@ paths:
                       $ref: '#/components/schemas/EventSummary'
   /api/v1/public/events/{eventId}:
     get:
+      security: []
       summary: Get a published public event by id
       tags: [PublicEvents]
       parameters:
@@ -47,6 +49,7 @@ paths:
           description: Event not found or not public
   /api/v1/auth/magic-link:
     post:
+      security: []
       summary: Request an email magic link
       tags: [Authentication]
       requestBody:
@@ -66,6 +69,8 @@ paths:
                 $ref: '#/components/schemas/ValidationError'
   /api/v1/organizer/events:
     get:
+      security:
+        - sessionAuth: []
       summary: List organizer-owned events
       tags: [OrganizerEvents]
       responses:
@@ -86,6 +91,8 @@ paths:
         '403':
           description: Organizer scope required
     post:
+      security:
+        - sessionAuth: []
       summary: Create a new organizer event
       tags: [OrganizerEvents]
       requestBody:
@@ -113,6 +120,8 @@ paths:
                 $ref: '#/components/schemas/ValidationError'
   /api/v1/organizer/events/{eventId}:
     patch:
+      security:
+        - sessionAuth: []
       summary: Update an organizer-owned event
       tags: [OrganizerEvents]
       parameters:
@@ -149,6 +158,8 @@ paths:
                 $ref: '#/components/schemas/ValidationError'
   /api/v1/organizer/events/{eventId}/status:
     get:
+      security:
+        - sessionAuth: []
       summary: Get organizer-visible event status
       tags: [OrganizerEvents]
       parameters:
@@ -173,6 +184,8 @@ paths:
           description: Event not found
   /api/v1/uploads/posters:
     post:
+      security:
+        - sessionAuth: []
       summary: Upload and validate a poster asset
       tags: [Uploads]
       requestBody:
@@ -199,6 +212,8 @@ paths:
           description: File too large
   /api/v1/admin/events:
     get:
+      security:
+        - sessionAuth: []
       summary: List admin-visible events for moderation
       tags: [AdminEvents]
       responses:
@@ -220,6 +235,8 @@ paths:
           description: Admin scope required
   /api/v1/admin/events/{eventId}/moderation:
     post:
+      security:
+        - sessionAuth: []
       summary: Publish or reject an event
       tags: [AdminEvents]
       parameters:
@@ -249,6 +266,11 @@ paths:
         '404':
           description: Event not found
 components:
+  securitySchemes:
+    sessionAuth:
+      type: apiKey
+      in: cookie
+      name: authjs.session-token
   schemas:
     EventSummary:
       type: object
@@ -268,8 +290,9 @@ components:
         locationLabel:
           type: string
         posterUrl:
-          type: string
-          nullable: true
+          type:
+            - string
+            - 'null'
     EventDetail:
       allOf:
         - $ref: '#/components/schemas/EventSummary'
@@ -279,14 +302,17 @@ components:
             description:
               type: string
             ticketUrl:
-              type: string
-              nullable: true
+              type:
+                - string
+                - 'null'
             registrationUrl:
-              type: string
-              nullable: true
+              type:
+                - string
+                - 'null'
             socialUrl:
-              type: string
-              nullable: true
+              type:
+                - string
+                - 'null'
             pricing:
               type: array
               items:
@@ -335,20 +361,24 @@ components:
           type: string
           format: date
         ticketUrl:
-          type: string
-          nullable: true
+          type:
+            - string
+            - 'null'
         registrationUrl:
-          type: string
-          nullable: true
+          type:
+            - string
+            - 'null'
         socialUrl:
-          type: string
-          nullable: true
+          type:
+            - string
+            - 'null'
         description:
           type: string
         posterAssetId:
-          type: string
+          type:
+            - string
+            - 'null'
           format: uuid
-          nullable: true
         locationId:
           type: string
         pricing:
@@ -380,20 +410,24 @@ components:
           type: string
           format: date
         ticketUrl:
-          type: string
-          nullable: true
+          type:
+            - string
+            - 'null'
         registrationUrl:
-          type: string
-          nullable: true
+          type:
+            - string
+            - 'null'
         socialUrl:
-          type: string
-          nullable: true
+          type:
+            - string
+            - 'null'
         description:
           type: string
         posterAssetId:
-          type: string
+          type:
+            - string
+            - 'null'
           format: uuid
-          nullable: true
         locationId:
           type: string
     PricingTier:
@@ -425,8 +459,9 @@ components:
               type: string
               enum: [sent, failed, skipped]
             warning:
-              type: string
-              nullable: true
+              type:
+                - string
+                - 'null'
     EventStatusResponse:
       type: object
       required: [eventId, status]
@@ -437,8 +472,9 @@ components:
         status:
           $ref: '#/components/schemas/SubmissionStatus'
         rejectionReason:
-          type: string
-          nullable: true
+          type:
+            - string
+            - 'null'
     PosterUploadResponse:
       type: object
       required: [posterAssetId, publicPath, mimeType, sizeBytes]
@@ -467,8 +503,9 @@ components:
           type: string
           enum: [publish, reject]
         reason:
-          type: string
-          nullable: true
+          type:
+            - string
+            - 'null'
     ModerationActionResponse:
       type: object
       required: [eventId, status]
