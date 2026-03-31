@@ -52,6 +52,21 @@ Missing evidence is `FAIL`.
 - [ ] Migration validation linked or marked N/A
 - [ ] SonarQube result linked or marked N/A
 
+### Manual Accessibility Evidence
+
+- [ ] Keyboard-only walkthrough completed for sign-in success path
+- [ ] Keyboard-only walkthrough completed for provider-failure recovery path
+- [ ] Keyboard-only walkthrough completed for magic-link rate-limit denial path
+- [ ] Keyboard-only walkthrough completed for unauthenticated redirect path
+- [ ] Keyboard-only walkthrough completed for unauthorized page path
+- [ ] Screen-reader announcement verified for login inline error (`role="alert"`)
+
+Manual notes (include browser, assistive technology, and any deviations):
+
+```
+[Example] Chrome 124 + VoiceOver macOS 14; all focus targets visible; no traps.
+```
+
 ## Exceptions
 
 - [ ] No constitution exceptions requested

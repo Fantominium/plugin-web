@@ -48,7 +48,7 @@ export const authConfig: NextAuthConfig = {
    */
   session: {
     strategy: 'database', // Use database-backed sessions for security
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+    maxAge: 24 * 60 * 60, // 24 hours
     updateAge: 24 * 60 * 60, // Update session every 24 hours
   },
 
@@ -93,6 +93,16 @@ export const authConfig: NextAuthConfig = {
       if (user) {
         // First sign-in: add user role
         const role = resolveUserRole(user.email || '');
+        const claimedRole = (user as { role?: string }).role;
+
+        if (claimedRole && claimedRole !== role) {
+          console.warn('auth.failure.untrusted_role_claim', {
+            email: user.email,
+            claimedRole,
+            resolvedRole: role,
+          });
+        }
+
         token.role = role;
         token.sub = user.id;
       }

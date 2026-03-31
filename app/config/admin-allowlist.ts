@@ -11,7 +11,7 @@ export function getAdminAllowlist(): string[] {
     return [...DEFAULT_ADMIN_ALLOWLIST];
   }
 
-  const parsed = envAllowlist.split(',').map(normalizeEmail).filter(Boolean);
+  const parsed = [...new Set(envAllowlist.split(',').map(normalizeEmail).filter(Boolean))];
 
   return parsed.length > 0 ? parsed : [...DEFAULT_ADMIN_ALLOWLIST];
 }

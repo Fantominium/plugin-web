@@ -124,6 +124,112 @@ Before submitting the slice for review, verify the following manually:
 
 ---
 
+## Evidence Anchors
+
+### manual-a11y
+
+Record keyboard and screen-reader walkthrough evidence for:
+
+- successful sign-in
+- provider-failure recovery
+- magic-link rate-limit denial
+- unauthenticated redirect
+- unauthorized page
+
+### metrics
+
+Capture and paste measured evidence for:
+
+- SC-001 first-attempt sign-in success rate (>= 95%)
+- SC-004 sign-in to protected landing p50 latency over 10 runs (<= 3s)
+- coverage thresholds (>= 90 line, >= 85 branch, and 100 for auth/policy branch paths)
+
+### quality-gates
+
+Paste the latest successful outputs from:
+
+- `npm run gates:precommit`
+- `npm run gates:prepush`
+- `npm run gates:ci`
+
+Include command timestamps and short notes for any retries.
+
+## Evidence Log (2026-03-31)
+
+### Coverage Evidence (T044)
+
+Command:
+
+```bash
+npm run test:ci
+```
+
+Observed result:
+
+- Overall line coverage: `82.92%`
+- Overall branch coverage: `71.46%`
+- Auth/policy branch samples:
+	- `app/lib/auth/magic-link.ts`: `92.85%`
+	- `app/lib/auth/authorize.ts`: `66.66%`
+	- `middleware.ts`: `78.57%`
+
+Threshold status:
+
+- `>= 90` line: `FAIL`
+- `>= 85` branch: `FAIL`
+- `100` auth/policy branch: `FAIL`
+
+### E2E Timing Evidence (T045)
+
+Command:
+
+```bash
+npx playwright test e2e/auth/login.spec.ts --grep "callback target" --repeat-each=10 --reporter=json > /tmp/login-auth-metrics.json
+```
+
+Parsed metrics:
+
+- Sample count: `20`
+- SC-004 p50 auth journey time: `2769.5ms` (`PASS`, budget `<= 3000ms`)
+
+### First-Attempt Success Evidence (T046)
+
+Source: same repeat-each run above.
+
+- Passed: `20`
+- Total: `20`
+- SC-001 success rate: `100%` (`PASS`, target `>= 95%`)
+
+### Manual Accessibility Evidence (T047)
+
+Reviewer checklist copied into PR template section `Manual Accessibility Evidence`.
+
+Walkthrough record (to be completed by reviewer before merge):
+
+- [ ] Sign-in success path
+- [ ] Provider-failure recovery path
+- [ ] Magic-link rate-limit denial path
+- [ ] Unauthenticated redirect path
+- [ ] Unauthorized page path
+- [ ] Screen-reader error announcement for login inline alert
+
+### Quality-Gate Sequence Output (T050)
+
+Executed sequence:
+
+```bash
+npm run gates:precommit
+npm run gates:prepush
+```
+
+Latest outcome summary:
+
+- Precommit: `PASS` (lint, typecheck, related tests, biome staged check)
+- Prepush: `PASS` (ci quality gates, contracts lint, a11y checks, full e2e, repository biome)
+- Notes: Redocly contract lints emitted warnings only; validation succeeded.
+
+---
+
 ## Key File Locations
 
 | File | Purpose |

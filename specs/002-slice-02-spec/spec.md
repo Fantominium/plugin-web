@@ -250,3 +250,16 @@ As a user attempting Google sign-in when the provider is unavailable, I receive 
 - **SC-003**: 100% of unauthorized access attempts to organizer/admin protected routes are denied in authorization test suites.
 - **SC-004**: Median time from successful authentication to reaching role-appropriate landing page is 3 seconds or less under normal staging conditions.
 - **SC-005**: 0 serious or critical accessibility violations are found on changed authentication and unauthorized-access surfaces.
+
+## Authorization Evidence Traceability
+
+| Requirement | Evidence Location | Validation Type |
+|-------------|-------------------|-----------------|
+| FR-009 Organizer protected-route access | `app/middleware.test.ts` (`allows organizer users into organizer routes`) | Integration |
+| FR-010 Admin protected-route access | `app/middleware.test.ts` (`allows admin users into both organizer and admin routes`) | Integration |
+| FR-011 Deny unauthorized, unauthenticated, and role-mismatch requests | `app/middleware.test.ts` (redirect and deny-path assertions) | Integration + Regression |
+| FR-012 Centralized server-side policy logic | `app/lib/auth/authorize.ts` + `app/lib/auth/authorize.test.ts` | Unit |
+| FR-013 Privilege escalation denial | `app/lib/auth/auth.ts` (`auth.failure.untrusted_role_claim`) + `app/lib/auth/authorize.test.ts` | Unit + Regression |
+| FR-014 Security-relevant auth-failure logging | `app/lib/auth/magic-link.ts`, `app/lib/auth/authorize.ts`, `middleware.ts` + related tests | Unit + Integration |
+| FR-017 Authenticated role mismatch renders `/unauthorized` | `middleware.ts` + `app/middleware.test.ts` (`denies organizer users from admin routes`) | Integration |
+| FR-018 Magic-link abuse control (5/email/hr) | `app/lib/auth/magic-link.ts` + `app/lib/auth/magic-link.test.ts` | Unit |

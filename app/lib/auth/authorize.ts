@@ -5,6 +5,10 @@
 
 import { isAllowlistedAdmin } from '@/app/config/admin-allowlist';
 
+function logAuthFailure(event: string, details: Record<string, unknown>) {
+  console.warn(event, details);
+}
+
 /**
  * Admin allowlist - users with these emails get admin role
  * This should be kept in sync with the repository configuration
@@ -17,7 +21,10 @@ const normalizeEmail = (email: string): string => email.trim().toLowerCase();
  * Allowlisted emails: admin
  */
 export function resolveUserRole(email: string): 'admin' | 'organizer' {
-  if (!email) return 'organizer';
+  if (!email) {
+    logAuthFailure('auth.failure.missing_email', { reason: 'email_required' });
+    return 'organizer';
+  }
   return isAllowlistedAdmin(normalizeEmail(email)) ? 'admin' : 'organizer';
 }
 
@@ -124,10 +131,18 @@ export function assertRole(
   requiredRole: 'admin' | 'organizer',
 ): void {
   if (requiredRole === 'admin' && userRole !== 'admin') {
+    logAuthFailure('auth.failure.role_required', {
+      requiredRole,
+      userRole: userRole ?? 'none',
+    });
     throw new Error('Admin role required');
   }
 
   if (requiredRole === 'organizer' && userRole !== 'admin' && userRole !== 'organizer') {
+    logAuthFailure('auth.failure.role_required', {
+      requiredRole,
+      userRole: userRole ?? 'none',
+    });
     throw new Error('Organizer role required');
   }
 }
@@ -144,6 +159,11 @@ export function assertOwnership(
   const canAccess = canAccessResource(userRole as 'admin' | 'organizer', userId, resourceOwnerId);
 
   if (!canAccess) {
+    logAuthFailure('auth.failure.ownership_mismatch', {
+      userRole: userRole ?? 'none',
+      userId,
+      resourceOwnerId,
+    });
     throw new Error('Access denied: insufficient permissions');
   }
 }

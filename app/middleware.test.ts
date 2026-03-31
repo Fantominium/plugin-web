@@ -1,272 +1,136 @@
-/**
- * Middleware tests for route protection and authorization
- * Validates that protected routes redirect unauthenticated/unauthorized users correctly
- */
+import type { NextRequest } from 'next/server';
+import { auth } from '@/auth';
 
-import { isValidPublicDestination } from '@/app/lib/public-routes';
+jest.mock('next/server', () => ({
+  NextResponse: {
+    next: () =>
+      ({
+        status: 200,
+        headers: new Headers(),
+      }) as Response,
+    redirect: (url: URL) =>
+      ({
+        status: 307,
+        headers: new Headers({ location: url.toString() }),
+      }) as Response,
+  },
+}));
 
-// Mock auth module
+const { middleware } = jest.requireActual('@/middleware') as typeof import('@/middleware');
+
 jest.mock('@/auth', () => ({
   auth: jest.fn(),
 }));
 
-type TestSession =
-  | {
-      user: {
-        email: string;
-        role: 'public' | 'organizer' | 'admin';
-      };
-    }
-  | null
-  | { user: undefined };
-describe('Middleware - Route Protection (T033)', () => {
-  const organizerRoutes = [
-    '/dashboard',
-    '/dashboard/events',
-    '/dashboard/events/new',
-    '/dashboard/profile',
-  ];
-  const adminRoutes = ['/admin', '/admin/moderation', '/admin/users', '/admin/settings'];
-  const matchesRoute = (pathname: string, routes: string[]): boolean => {
-    return routes.some((route) => pathname === route || pathname.startsWith(`${route}/`));
-  };
-  const isPublicPath = (pathname: string): boolean => {
-    return pathname === '/login' || isValidPublicDestination(pathname);
-  };
+const authMock = auth as jest.Mock;
 
-  describe('Public Route Access Logic', () => {
-    it('should allow unauthenticated access to home page', () => {
-      expect(isPublicPath('/')).toBe(true);
-    });
+function createRequest(pathname: string): NextRequest {
+  const requestUrl = `http://localhost${pathname}`;
+  return {
+    nextUrl: new URL(requestUrl),
+    url: requestUrl,
+  } as unknown as NextRequest;
+}
 
-    it('should allow unauthenticated access to /events route', () => {
-      expect(isPublicPath('/events')).toBe(true);
-    });
+describe('middleware auth guard', () => {
+  beforeEach(() => {
+    jest.resetAllMocks();
+  });
 
-    it('should allow unauthenticated access to /contact-us route', () => {
-      expect(isPublicPath('/contact-us')).toBe(true);
-    });
+  it('redirects unauthenticated organizer route access to login with callbackUrl', async () => {
+    authMock.mockResolvedValue(null);
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
 
-    it('should allow unauthenticated access to legal pages', () => {
-      expect(isPublicPath('/privacy-policy')).toBe(true);
-      expect(isPublicPath('/terms-and-conditions')).toBe(true);
-    });
+    const response = await middleware(createRequest('/dashboard'));
 
-    it('should allow unauthenticated access to /login page', () => {
-      expect(isPublicPath('/login')).toBe(true);
-    });
-
-    it('should not treat /dashboard as public because / is public', () => {
-      expect(isPublicPath('/dashboard')).toBe(false);
-    });
-
-    it('should allow access to /api/auth routes without session check', () => {
-      const pathname = '/api/auth/callback/google';
-      const isAuthRoute = pathname.startsWith('/api/auth');
-      expect(isAuthRoute).toBe(true);
+    expect(response.headers.get('location')).toContain('/login?callbackUrl=%2Fdashboard');
+    expect(warnSpy).toHaveBeenCalledWith('auth.failure.unauthenticated_route_access', {
+      pathname: '/dashboard',
+      requiredRole: 'organizer',
     });
   });
 
-  describe('Organizer Dashboard Protection Logic', () => {
-    it('should protect /dashboard from unauthenticated users', () => {
-      const pathname = '/dashboard';
-      const session = null;
-      const isOrganizers = matchesRoute(pathname, organizerRoutes);
-      const isProtected = isOrganizers && !session;
-      expect(isProtected).toBe(true);
-    });
+  it('redirects unauthenticated admin route access to login with callbackUrl', async () => {
+    authMock.mockResolvedValue(null);
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
 
-    it('should protect /dashboard/events from unauthenticated users', () => {
-      const pathname = '/dashboard/events';
-      const session = null;
-      const isOrganizers = matchesRoute(pathname, organizerRoutes);
-      const isProtected = isOrganizers && !session;
-      expect(isProtected).toBe(true);
-    });
+    const response = await middleware(createRequest('/admin/users'));
 
-    it('should protect /dashboard/events/new from unauthenticated users', () => {
-      const pathname = '/dashboard/events/new';
-      const session = null;
-      const isOrganizers = matchesRoute(pathname, organizerRoutes);
-      const isProtected = isOrganizers && !session;
-      expect(isProtected).toBe(true);
-    });
-
-    it('should allow organizer role access to /dashboard', () => {
-      const pathname = '/dashboard';
-      const session: TestSession = { user: { email: 'org@example.com', role: 'organizer' } };
-      const isOrganizers = matchesRoute(pathname, organizerRoutes);
-      const userRole = session?.user?.role;
-      const isAuthorized = userRole === 'organizer' || userRole === 'admin';
-      expect(isOrganizers && isAuthorized).toBe(true);
-    });
-
-    it('should allow admin role access to /dashboard', () => {
-      const pathname = '/dashboard';
-      const session: TestSession = { user: { email: 'admin@example.com', role: 'admin' } };
-      const isOrganizers = matchesRoute(pathname, organizerRoutes);
-      const userRole = session?.user?.role;
-      const isAuthorized = userRole === 'organizer' || userRole === 'admin';
-      expect(isOrganizers && isAuthorized).toBe(true);
-    });
-
-    it('should deny non-organizer/non-admin users from /dashboard', () => {
-      const pathname = '/dashboard';
-      const session: TestSession = { user: { email: 'user@example.com', role: 'public' } };
-      const isOrganizers = matchesRoute(pathname, organizerRoutes);
-      const userRole = session?.user?.role;
-      const isAuthorized = userRole === 'organizer' || userRole === 'admin';
-      expect(isOrganizers && !isAuthorized).toBe(true);
+    expect(response.headers.get('location')).toContain('/login?callbackUrl=%2Fadmin%2Fusers');
+    expect(warnSpy).toHaveBeenCalledWith('auth.failure.unauthenticated_route_access', {
+      pathname: '/admin/users',
+      requiredRole: 'admin',
     });
   });
 
-  describe('Admin Panel Protection Logic', () => {
-    it('should protect /admin from unauthenticated users', () => {
-      const pathname = '/admin';
-      const session = null;
-      const isAdmin = matchesRoute(pathname, adminRoutes);
-      const isProtected = isAdmin && !session;
-      expect(isProtected).toBe(true);
-    });
+  it('allows organizer users into organizer routes', async () => {
+    authMock.mockResolvedValue({ user: { role: 'organizer' } } as never);
 
-    it('should allow admin role access to /admin panel', () => {
-      const pathname = '/admin';
-      const session: TestSession = { user: { email: 'admin@example.com', role: 'admin' } };
-      const isAdmin = matchesRoute(pathname, adminRoutes);
-      const userRole = session?.user?.role;
-      const isAuthorized = userRole === 'admin';
-      expect(isAdmin && isAuthorized).toBe(true);
-    });
+    const response = await middleware(createRequest('/dashboard/events'));
 
-    it('should deny organizer role access to /admin panel', () => {
-      const pathname = '/admin';
-      const session: TestSession = { user: { email: 'org@example.com', role: 'organizer' } };
-      const isAdmin = matchesRoute(pathname, adminRoutes);
-      const userRole = session?.user?.role;
-      const isAuthorized = userRole === 'admin';
-      expect(isAdmin && !isAuthorized).toBe(true);
-    });
+    expect(response.headers.get('location')).toBeNull();
+    expect(response.status).toBe(200);
+  });
 
-    it('should deny public user access to /admin panel', () => {
-      const pathname = '/admin';
-      const session: TestSession = { user: { email: 'user@example.com', role: 'public' } };
-      const isAdmin = matchesRoute(pathname, adminRoutes);
-      const userRole = session?.user?.role;
-      const isAuthorized = userRole === 'admin';
-      expect(isAdmin && !isAuthorized).toBe(true);
-    });
+  it('denies non-organizer role on organizer routes and redirects to unauthorized', async () => {
+    authMock.mockResolvedValue({ user: { role: 'public' } } as never);
 
-    it('should protect all admin subroutes', () => {
-      const testRoutes = ['/admin/moderation', '/admin/users', '/admin/settings'];
+    const response = await middleware(createRequest('/dashboard/events'));
 
-      for (const route of testRoutes) {
-        const isAdmin = matchesRoute(route, adminRoutes);
-        expect(isAdmin).toBe(true);
-      }
+    expect(response.headers.get('location')).toContain('/unauthorized');
+  });
+
+  it('denies organizer users from admin routes and logs role denial', async () => {
+    authMock.mockResolvedValue({ user: { role: 'organizer' } } as never);
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
+
+    const response = await middleware(createRequest('/admin'));
+
+    expect(response.headers.get('location')).toContain('/unauthorized');
+    expect(warnSpy).toHaveBeenCalledWith('auth.failure.role_denied', {
+      pathname: '/admin',
+      requiredRole: 'admin',
+      userRole: 'organizer',
     });
   });
 
-  describe('Authorization Boundary Enforcement', () => {
-    it('should prevent privilege escalation: non-admin cannot access /admin/users', () => {
-      const pathname = '/admin/users';
-      const session: TestSession = { user: { email: 'org@example.com', role: 'organizer' } };
-      const isAdmin = matchesRoute(pathname, adminRoutes);
-      const userRole = session?.user?.role;
-      const isAuthorized = userRole === 'admin';
-      expect(isAdmin && !isAuthorized).toBe(true);
-    });
+  it('allows admin users into both organizer and admin routes', async () => {
+    authMock.mockResolvedValue({ user: { role: 'admin' } } as never);
 
-    it('should enforce allow-path: admin can access /dashboard', () => {
-      const pathname = '/dashboard';
-      const session: TestSession = { user: { email: 'admin@example.com', role: 'admin' } };
-      const isOrganizers = matchesRoute(pathname, organizerRoutes);
-      const userRole = session?.user?.role;
-      // Admin should have super-user access
-      const isAuthorized = userRole === 'admin' || userRole === 'organizer';
-      expect(isOrganizers && isAuthorized).toBe(true);
-    });
+    const organizerResponse = await middleware(createRequest('/dashboard'));
+    const adminResponse = await middleware(createRequest('/admin/settings'));
 
-    it('should enforce deny-path: unauthenticated cannot access any protected route', () => {
-      const protectedRoutes = ['/dashboard', '/admin'];
-      const session = null;
-
-      for (const route of protectedRoutes) {
-        const isOrganizers = matchesRoute(route, organizerRoutes);
-        const isAdmin = matchesRoute(route, adminRoutes);
-        const isProtected = (isOrganizers || isAdmin) && !session;
-        expect(isProtected).toBe(true);
-      }
-    });
+    expect(organizerResponse.headers.get('location')).toBeNull();
+    expect(adminResponse.headers.get('location')).toBeNull();
   });
 
-  describe('Session Edge Cases', () => {
-    it('should treat missing session as unauthenticated', () => {
-      const session = null;
-      const isAuthenticated = !!session;
-      expect(isAuthenticated).toBe(false);
-    });
+  it('allows public routes without auth calls', async () => {
+    const response = await middleware(createRequest('/login'));
 
-    it('should require session.user for authorization checks', () => {
-      const session1: TestSession = { user: undefined };
-      const session2 = { user: { email: 'org@example.com', role: 'organizer' as const } };
-
-      const isValid1 = !!session1?.user;
-      const isValid2 = !!session2?.user;
-
-      expect(isValid1).toBe(false);
-      expect(isValid2).toBe(true);
-    });
+    expect(response.status).toBe(200);
+    expect(authMock).not.toHaveBeenCalled();
   });
 
-  describe('HTTP Methods', () => {
-    it('should protect GET requests to dashboard', () => {
-      const pathname = '/dashboard';
-      const isOrganizers = matchesRoute(pathname, organizerRoutes);
-      const session = null;
-      const isProtected = isOrganizers && !session;
-      expect(isProtected).toBe(true);
-    });
+  it('allows auth callback boundary route without session evaluation', async () => {
+    const response = await middleware(createRequest('/api/auth/callback/google'));
 
-    it('should protect POST requests to dashboard', () => {
-      const pathname = '/dashboard';
-      const isOrganizers = matchesRoute(pathname, organizerRoutes);
-      const session = null;
-      const isProtected = isOrganizers && !session;
-      expect(isProtected).toBe(true);
-    });
-
-    it('should protect PUT requests to admin routes', () => {
-      const pathname = '/admin/users/123';
-      const isAdmin = matchesRoute(pathname, adminRoutes);
-      const session = null;
-      const isProtected = isAdmin && !session;
-      expect(isProtected).toBe(true);
-    });
+    expect(response.status).toBe(200);
+    expect(authMock).not.toHaveBeenCalled();
   });
 
-  describe('Route Matching Logic', () => {
-    it('should correctly match /dashboard as protected route', () => {
-      const pathname = '/dashboard';
-      const matches = matchesRoute(pathname, organizerRoutes);
-      expect(matches).toBe(true);
-    });
+  it('encodes callbackUrl and keeps protected details in URL-safe form', async () => {
+    authMock.mockResolvedValue(null);
 
-    it('should correctly match /dashboard/profile as protected route', () => {
-      const pathname = '/dashboard/profile';
-      const matches = matchesRoute(pathname, organizerRoutes);
-      expect(matches).toBe(true);
-    });
+    const response = await middleware(createRequest('/admin/settings?tab=roles'));
 
-    it('should not match /dashboards (typo) as protected route', () => {
-      const pathname = '/dashboards';
-      const matches = matchesRoute(pathname, organizerRoutes);
-      expect(matches).toBe(false);
-    });
+    expect(response.headers.get('location')).toContain('/login?callbackUrl=%2Fadmin%2Fsettings');
+  });
 
-    it('should correctly match /admin/moderation as admin route', () => {
-      const pathname = '/admin/moderation';
-      const matches = matchesRoute(pathname, adminRoutes);
-      expect(matches).toBe(true);
-    });
+  it('allows unauthenticated requests for non-protected internal paths', async () => {
+    authMock.mockResolvedValue(null);
+
+    const response = await middleware(createRequest('/api/internal/health'));
+
+    expect(response.status).toBe(200);
   });
 });

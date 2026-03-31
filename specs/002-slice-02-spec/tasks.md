@@ -11,9 +11,9 @@
 
 **Purpose**: Prepare shared test scaffolding and quality-gate alignment for this slice.
 
-- [ ] T001 Update evidence sections and anchors in specs/002-slice-02-spec/quickstart.md for manual-a11y, metrics, and quality-gate reporting
-- [ ] T002 [P] Add auth test data helpers for organizer/admin identities in app/lib/auth/auth.test.ts
-- [ ] T003 [P] Add reusable logging assertion helper for auth security events in app/lib/auth/magic-link.test.ts
+- [X] T001 Update evidence sections and anchors in specs/002-slice-02-spec/quickstart.md for manual-a11y, metrics, and quality-gate reporting
+- [X] T002 [P] Add auth test data helpers for organizer/admin identities in app/lib/auth/auth.test.ts
+- [X] T003 [P] Add reusable logging assertion helper for auth security events in app/lib/auth/magic-link.test.ts
 
 ---
 
@@ -23,11 +23,11 @@
 
 **CRITICAL**: No user story work begins until this phase is complete.
 
-- [ ] T004 Implement 24-hour session expiry in app/lib/auth/auth.ts
-- [ ] T005 [P] Implement structured auth-failure logging hooks in app/lib/auth/authorize.ts
-- [ ] T006 [P] Implement structured auth-failure logging hooks in middleware.ts
-- [ ] T007 Add deterministic security-log assertions for shared middleware/auth behavior in app/middleware.test.ts
-- [ ] T008 Add branch-coverage assertions for auth policy paths in app/lib/auth/authorize.test.ts
+- [X] T004 Implement 24-hour session expiry in app/lib/auth/auth.ts
+- [X] T005 [P] Implement structured auth-failure logging hooks in app/lib/auth/authorize.ts
+- [X] T006 [P] Implement structured auth-failure logging hooks in middleware.ts
+- [X] T007 Add deterministic security-log assertions for shared middleware/auth behavior in app/middleware.test.ts
+- [X] T008 Add branch-coverage assertions for auth policy paths in app/lib/auth/authorize.test.ts
 
 **Checkpoint**: Foundation complete; user stories can proceed.
 
@@ -41,17 +41,17 @@
 
 ### Tests for User Story 1
 
-- [ ] T009 [P] [US1] Add integration coverage for organizer session issuance and protected-route access in app/lib/auth/auth.test.ts
-- [ ] T010 [P] [US1] Add middleware integration tests for organizer allow/deny paths in app/middleware.test.ts
-- [ ] T011 [P] [US1] Add end-to-end organizer sign-in and landing journey in e2e/auth/login.spec.ts
-- [ ] T012 [P] [US1] Add authorization regression test for organizer role-mismatch denial in app/middleware.test.ts
+- [X] T009 [P] [US1] Add integration coverage for organizer session issuance and protected-route access in app/lib/auth/auth.test.ts
+- [X] T010 [P] [US1] Add middleware integration tests for organizer allow/deny paths in app/middleware.test.ts
+- [X] T011 [P] [US1] Add end-to-end organizer sign-in and landing journey in e2e/auth/login.spec.ts
+- [X] T012 [P] [US1] Add authorization regression test for organizer role-mismatch denial in app/middleware.test.ts
 
 ### Implementation for User Story 1
 
-- [ ] T013 [US1] Add organizer route-guard invariance comments and no-behavior-change assertions in middleware.ts
-- [ ] T014 [US1] Implement explicit organizer role-claim distrust guard in app/lib/auth/authorize.ts
-- [ ] T015 [US1] Implement organizer callbackUrl redirect handling in app/(pages)/login/page.tsx
-- [ ] T016 [US1] Implement explicit unauthorized-state copy and action targets in app/(pages)/unauthorized/page.tsx
+- [X] T013 [US1] Add organizer route-guard invariance comments and no-behavior-change assertions in middleware.ts
+- [X] T014 [US1] Implement explicit organizer role-claim distrust guard in app/lib/auth/authorize.ts
+- [X] T015 [US1] Implement organizer callbackUrl redirect handling in app/(pages)/login/page.tsx
+- [X] T016 [US1] Implement explicit unauthorized-state copy and action targets in app/(pages)/unauthorized/page.tsx
 
 **Checkpoint**: User Story 1 is independently functional and testable.
 
@@ -65,17 +65,17 @@
 
 ### Tests for User Story 2
 
-- [ ] T017 [P] [US2] Add allowlist resolution and admin-role assignment tests in app/lib/auth/authorize.test.ts
-- [ ] T018 [P] [US2] Add middleware tests for admin allow/deny route enforcement in app/middleware.test.ts
-- [ ] T019 [P] [US2] Add end-to-end admin sign-in and admin-panel access journey in e2e/auth/login.spec.ts
-- [ ] T020 [P] [US2] Add authorization regression test for admin privilege-escalation denial in app/lib/auth/authorize.test.ts
+- [X] T017 [P] [US2] Add allowlist resolution and admin-role assignment tests in app/lib/auth/authorize.test.ts
+- [X] T018 [P] [US2] Add middleware tests for admin allow/deny route enforcement in app/middleware.test.ts
+- [X] T019 [P] [US2] Add end-to-end admin sign-in and admin-panel access journey in e2e/auth/login.spec.ts
+- [X] T020 [P] [US2] Add authorization regression test for admin privilege-escalation denial in app/lib/auth/authorize.test.ts
 
 ### Implementation for User Story 2
 
-- [ ] T021 [US2] Implement trimmed lowercase and duplicate-safe allowlist parsing in app/config/admin-allowlist.ts
-- [ ] T022 [US2] Enforce admin role resolution from allowlist-only logic in app/lib/auth/authorize.ts
-- [ ] T023 [US2] Add admin route-guard invariance comments and no-behavior-change assertions in middleware.ts
-- [ ] T024 [US2] Implement admin callbackUrl and post-login landing handling in app/(pages)/login/page.tsx
+- [X] T021 [US2] Implement trimmed lowercase and duplicate-safe allowlist parsing in app/config/admin-allowlist.ts
+- [X] T022 [US2] Enforce admin role resolution from allowlist-only logic in app/lib/auth/authorize.ts
+- [X] T023 [US2] Add admin route-guard invariance comments and no-behavior-change assertions in middleware.ts
+- [X] T024 [US2] Implement admin callbackUrl and post-login landing handling in app/(pages)/login/page.tsx
 
 **Checkpoint**: User Story 2 is independently functional and testable.
 
@@ -89,21 +89,21 @@
 
 ### Tests for User Story 3
 
-- [ ] T025 [P] [US3] Add magic-link expiry and replay unit tests in app/lib/auth/magic-link.test.ts
-- [ ] T026 [P] [US3] Add magic-link concurrent consumption first-writer-wins tests in app/lib/auth/magic-link.test.ts
-- [ ] T027 [P] [US3] Add per-email rolling-window rate-limit tests in app/lib/auth/magic-link.test.ts
-- [ ] T028 [P] [US3] Add integration tests for magic-link session issuance and denial outcomes in app/lib/auth/auth.test.ts
-- [ ] T029 [P] [US3] Add regression tests for replay-token and escalation denial paths in app/lib/auth/magic-link.test.ts
-- [ ] T030 [P] [US3] Add network-security abuse-control assertions for magic-link request throttling in app/lib/auth/magic-link.test.ts
-- [ ] T031 [P] [US3] Add secret non-exposure log assertions (hashed email only, no plaintext) in app/lib/auth/magic-link.test.ts
-- [ ] T032 [P] [US3] Add CSRF/CORS/timeout expectation tests for auth trust-boundary behavior in app/middleware.test.ts
+- [X] T025 [P] [US3] Add magic-link expiry and replay unit tests in app/lib/auth/magic-link.test.ts
+- [X] T026 [P] [US3] Add magic-link concurrent consumption first-writer-wins tests in app/lib/auth/magic-link.test.ts
+- [X] T027 [P] [US3] Add per-email rolling-window rate-limit tests in app/lib/auth/magic-link.test.ts
+- [X] T028 [P] [US3] Add integration tests for magic-link session issuance and denial outcomes in app/lib/auth/auth.test.ts
+- [X] T029 [P] [US3] Add regression tests for replay-token and escalation denial paths in app/lib/auth/magic-link.test.ts
+- [X] T030 [P] [US3] Add network-security abuse-control assertions for magic-link request throttling in app/lib/auth/magic-link.test.ts
+- [X] T031 [P] [US3] Add secret non-exposure log assertions (hashed email only, no plaintext) in app/lib/auth/magic-link.test.ts
+- [X] T032 [P] [US3] Add CSRF/CORS/timeout expectation tests for auth trust-boundary behavior in app/middleware.test.ts
 
 ### Implementation for User Story 3
 
-- [ ] T033 [US3] Implement rolling-window magic-link rate limiting and helper store in app/lib/auth/magic-link.ts
-- [ ] T034 [US3] Implement atomic token-claim documentation and replay logging in app/lib/auth/magic-link.ts
-- [ ] T035 [US3] Implement expired-token and replay-token denial telemetry with hashed identifiers in app/lib/auth/magic-link.ts
-- [ ] T036 [US3] Implement magic-link sign-in error propagation to login UI in app/(pages)/login/page.tsx
+- [X] T033 [US3] Implement rolling-window magic-link rate limiting and helper store in app/lib/auth/magic-link.ts
+- [X] T034 [US3] Implement atomic token-claim documentation and replay logging in app/lib/auth/magic-link.ts
+- [X] T035 [US3] Implement expired-token and replay-token denial telemetry with hashed identifiers in app/lib/auth/magic-link.ts
+- [X] T036 [US3] Implement magic-link sign-in error propagation to login UI in app/(pages)/login/page.tsx
 
 **Checkpoint**: User Story 3 is independently functional and testable.
 
@@ -117,16 +117,16 @@
 
 ### Tests for User Story 4
 
-- [ ] T037 [P] [US4] Add login UI unit tests for provider-failure inline error rendering in app/(pages)/login/page.test.tsx
-- [ ] T038 [P] [US4] Add login UI tests for persistent magic-link form visibility during provider failure in app/(pages)/login/page.test.tsx
-- [ ] T039 [P] [US4] Add accessibility-focused tests for error announcement wiring in app/(pages)/login/page.test.tsx
-- [ ] T040 [P] [US4] Add end-to-end provider-failure recovery journey in e2e/auth/login.spec.ts
+- [X] T037 [P] [US4] Add login UI unit tests for provider-failure inline error rendering in app/(pages)/login/page.test.tsx
+- [X] T038 [P] [US4] Add login UI tests for persistent magic-link form visibility during provider failure in app/(pages)/login/page.test.tsx
+- [X] T039 [P] [US4] Add accessibility-focused tests for error announcement wiring in app/(pages)/login/page.test.tsx
+- [X] T040 [P] [US4] Add end-to-end provider-failure recovery journey in e2e/auth/login.spec.ts
 
 ### Implementation for User Story 4
 
-- [ ] T041 [US4] Implement accessible inline provider-failure error state in app/(pages)/login/page.tsx
-- [ ] T042 [US4] Implement focus-management behavior for provider-failure error state in app/(pages)/login/page.tsx
-- [ ] T043 [US4] Implement magic-link UI persistence during provider-failure state in app/(pages)/login/page.tsx
+- [X] T041 [US4] Implement accessible inline provider-failure error state in app/(pages)/login/page.tsx
+- [X] T042 [US4] Implement focus-management behavior for provider-failure error state in app/(pages)/login/page.tsx
+- [X] T043 [US4] Implement magic-link UI persistence during provider-failure state in app/(pages)/login/page.tsx
 
 **Checkpoint**: User Story 4 is independently functional and testable.
 
@@ -136,13 +136,13 @@
 
 **Purpose**: Final cross-story validation, evidence capture, and hardening.
 
-- [ ] T044 [P] Run and record coverage-threshold evidence (>=90 line, >=85 branch, 100 auth/policy branch) in specs/002-slice-02-spec/quickstart.md
-- [ ] T045 [P] Run and record end-to-end timing evidence for SC-004 (p50 <= 3s over 10 runs) in e2e/auth/login.spec.ts
-- [ ] T046 [P] Run and record first-attempt sign-in success-rate evidence for SC-001 (>=95%) in e2e/auth/login.spec.ts
-- [ ] T047 [P] Record manual accessibility verification evidence in pull request checklist and specs/002-slice-02-spec/quickstart.md
-- [ ] T048 [P] Update manual accessibility evidence prompt in .github/pull_request_template.md
-- [ ] T049 [P] Record authorization allow/deny/escalation evidence traceability in specs/002-slice-02-spec/spec.md
-- [ ] T050 Run full quality-gate command sequence once and capture command outputs in specs/002-slice-02-spec/quickstart.md
+- [X] T044 [P] Run and record coverage-threshold evidence (>=90 line, >=85 branch, 100 auth/policy branch) in specs/002-slice-02-spec/quickstart.md
+- [X] T045 [P] Run and record end-to-end timing evidence for SC-004 (p50 <= 3s over 10 runs) in e2e/auth/login.spec.ts
+- [X] T046 [P] Run and record first-attempt sign-in success-rate evidence for SC-001 (>=95%) in e2e/auth/login.spec.ts
+- [X] T047 [P] Record manual accessibility verification evidence in pull request checklist and specs/002-slice-02-spec/quickstart.md
+- [X] T048 [P] Update manual accessibility evidence prompt in .github/pull_request_template.md
+- [X] T049 [P] Record authorization allow/deny/escalation evidence traceability in specs/002-slice-02-spec/spec.md
+- [X] T050 Run full quality-gate command sequence once and capture command outputs in specs/002-slice-02-spec/quickstart.md
 
 ---
 

@@ -47,7 +47,15 @@ export async function POST(request: Request) {
       return jsonError(buildApiError('forbidden', 'Invalid CSRF token'));
     }
 
-    const { token, expiresAt } = issueMagicLink(email);
+    const issuedLink = issueMagicLink(email);
+
+    if ('error' in issuedLink) {
+      return jsonError(
+        buildApiError('forbidden', 'Too many magic-link requests. Try again in an hour.'),
+      );
+    }
+
+    const { token, expiresAt } = issuedLink;
 
     return NextResponse.json(
       {

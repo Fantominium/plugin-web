@@ -9,6 +9,10 @@ import { NextResponse } from 'next/server';
 import { isValidPublicDestination } from '@/app/lib/public-routes';
 import { auth } from '@/auth';
 
+function logAuthFailure(event: string, details: Record<string, unknown>) {
+  console.warn(event, details);
+}
+
 /**
  * Protected organizer routes
  * Require 'organizer' or 'admin' role
@@ -56,12 +60,20 @@ export async function middleware(request: NextRequest) {
   // Redirect unauthenticated users to login
   if (!session) {
     if (matchesRoute(pathname, organizerRoutes)) {
+      logAuthFailure('auth.failure.unauthenticated_route_access', {
+        pathname,
+        requiredRole: 'organizer',
+      });
       return NextResponse.redirect(
         new URL(`/login?callbackUrl=${encodeURIComponent(pathname)}`, request.url),
       );
     }
 
     if (matchesRoute(pathname, adminRoutes)) {
+      logAuthFailure('auth.failure.unauthenticated_route_access', {
+        pathname,
+        requiredRole: 'admin',
+      });
       return NextResponse.redirect(
         new URL(`/login?callbackUrl=${encodeURIComponent(pathname)}`, request.url),
       );
@@ -75,9 +87,15 @@ export async function middleware(request: NextRequest) {
 
   // Check organizer dashboard access
   if (matchesRoute(pathname, organizerRoutes)) {
+    // Invariant: organizer routes remain accessible to organizers and admins only.
     const isAuthorized = userRole === 'organizer' || userRole === 'admin';
 
     if (!isAuthorized) {
+      logAuthFailure('auth.failure.role_denied', {
+        pathname,
+        requiredRole: 'organizer',
+        userRole: userRole ?? 'none',
+      });
       return NextResponse.redirect(new URL('/unauthorized', request.url));
     }
 
@@ -86,9 +104,15 @@ export async function middleware(request: NextRequest) {
 
   // Check admin panel access
   if (matchesRoute(pathname, adminRoutes)) {
+    // Invariant: admin routes remain deny-by-default unless role is exactly admin.
     const isAuthorized = userRole === 'admin';
 
     if (!isAuthorized) {
+      logAuthFailure('auth.failure.role_denied', {
+        pathname,
+        requiredRole: 'admin',
+        userRole: userRole ?? 'none',
+      });
       return NextResponse.redirect(new URL('/unauthorized', request.url));
     }
 

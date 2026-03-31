@@ -6,6 +6,57 @@
 import type { Session } from 'next-auth';
 import type { JWT } from 'next-auth/jwt';
 
+jest.mock('@auth/prisma-adapter', () => ({
+  PrismaAdapter: jest.fn(() => ({})),
+}));
+
+jest.mock('next-auth/providers/google', () => jest.fn(() => ({ id: 'google' })));
+jest.mock('next-auth/providers/resend', () => jest.fn(() => ({ id: 'resend' })));
+jest.mock('@/app/lib/prisma', () => ({ prisma: {} }));
+
+import { authConfig } from '@/app/lib/auth/auth';
+import {
+  clearMagicLinkRateLimitStore,
+  clearMagicLinkStore,
+  issueMagicLink,
+  verifyMagicLinkToken,
+} from '@/app/lib/auth/magic-link';
+
+const TEST_IDENTITIES = {
+  organizer: {
+    id: 'organizer-1',
+    email: 'organizer@pluginbim.com',
+    role: 'organizer' as const,
+  },
+  admin: {
+    id: 'admin-1',
+    email: 'admin@pluginbim.com',
+    role: 'admin' as const,
+  },
+};
+
+function createMockJwt(role: 'organizer' | 'admin'): JWT {
+  const identity = role === 'admin' ? TEST_IDENTITIES.admin : TEST_IDENTITIES.organizer;
+
+  return {
+    sub: identity.id,
+    email: identity.email,
+    role: identity.role,
+  };
+}
+
+function createMockSession(role: 'organizer' | 'admin'): Partial<AuthorizedSession> {
+  const identity = role === 'admin' ? TEST_IDENTITIES.admin : TEST_IDENTITIES.organizer;
+
+  return {
+    user: {
+      id: identity.id,
+      email: identity.email,
+      role: identity.role,
+    },
+  };
+}
+
 // Test types and mock data
 interface AuthorizedSession extends Session {
   user: {
@@ -17,6 +68,16 @@ interface AuthorizedSession extends Session {
 }
 
 describe('Auth Configuration', () => {
+  beforeEach(() => {
+    clearMagicLinkStore();
+    clearMagicLinkRateLimitStore();
+  });
+
+  it('configures 24-hour database sessions', () => {
+    expect(authConfig.session?.strategy).toBe('database');
+    expect(authConfig.session?.maxAge).toBe(24 * 60 * 60);
+  });
+
   describe('Provider Configuration', () => {
     it('should configure Google OAuth provider with required scopes', () => {
       // This test verifies that the Auth.js config includes Google provider
@@ -32,7 +93,121 @@ describe('Auth Configuration', () => {
     });
   });
 
+  describe('Event callbacks', () => {
+    it('logs sign-in and sign-out events', async () => {
+      const logSpy = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+
+      await authConfig.events?.signIn?.({ user: { email: 'logger@example.com' } } as never);
+      await authConfig.events?.signOut?.({} as never);
+
+      expect(logSpy).toHaveBeenCalledWith('User logger@example.com signed in');
+      expect(logSpy).toHaveBeenCalledWith('User signed out');
+    });
+  });
+
   describe('Session Callbacks', () => {
+    it('rejects sign-in callback when email is missing', async () => {
+      const callback = authConfig.callbacks?.signIn;
+      const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+
+      const result = await callback?.({ user: { id: 'missing-email' } } as never);
+
+      expect(result).toBe(false);
+      expect(errorSpy).toHaveBeenCalledWith('Sign-in attempted without email');
+    });
+
+    it('accepts sign-in callback when email is present', async () => {
+      const callback = authConfig.callbacks?.signIn;
+
+      const result = await callback?.({
+        user: { id: 'with-email', email: 'ok@example.com' },
+      } as never);
+
+      expect(result).toBe(true);
+    });
+
+    it('logs untrusted role claim in jwt callback and keeps resolved role', async () => {
+      const callback = authConfig.callbacks?.jwt;
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
+
+      const token = await callback?.({
+        token: {},
+        user: {
+          id: TEST_IDENTITIES.organizer.id,
+          email: TEST_IDENTITIES.organizer.email,
+          role: 'admin',
+        },
+      } as never);
+
+      expect(token?.role).toBe('organizer');
+      expect(warnSpy).toHaveBeenCalledWith('auth.failure.untrusted_role_claim', {
+        email: TEST_IDENTITIES.organizer.email,
+        claimedRole: 'admin',
+        resolvedRole: 'organizer',
+      });
+    });
+
+    it('keeps existing jwt claims when callback receives no user payload', async () => {
+      const callback = authConfig.callbacks?.jwt;
+
+      const token = await callback?.({
+        token: { sub: 'existing', role: 'admin' },
+      } as never);
+
+      expect(token?.sub).toBe('existing');
+      expect(token?.role).toBe('admin');
+    });
+
+    it('supports redirect callback for relative, same-origin, and external urls', async () => {
+      const callback = authConfig.callbacks?.redirect;
+      const baseUrl = 'https://app.example.com';
+
+      const relative = await callback?.({ url: '/dashboard', baseUrl } as never);
+      const sameOrigin = await callback?.({
+        url: 'https://app.example.com/admin',
+        baseUrl,
+      } as never);
+      const external = await callback?.({
+        url: 'https://evil.example.com/steal',
+        baseUrl,
+      } as never);
+
+      expect(relative).toBe('https://app.example.com/dashboard');
+      expect(sameOrigin).toBe('https://app.example.com/admin');
+      expect(external).toBe('https://app.example.com');
+    });
+
+    it('assigns organizer role by default in jwt callback', async () => {
+      const callback = authConfig.callbacks?.jwt;
+      expect(callback).toBeDefined();
+
+      const token = await callback?.({
+        token: {},
+        user: {
+          id: TEST_IDENTITIES.organizer.id,
+          email: TEST_IDENTITIES.organizer.email,
+        },
+      } as never);
+
+      expect(token?.role).toBe('organizer');
+    });
+
+    it('maps token role into session user for protected-route checks', async () => {
+      const callback = authConfig.callbacks?.session;
+      expect(callback).toBeDefined();
+
+      const session = await callback?.({
+        session: { user: { email: TEST_IDENTITIES.admin.email } },
+        token: {
+          sub: TEST_IDENTITIES.admin.id,
+          role: 'admin',
+        },
+      } as never);
+
+      expect((session?.user as { id?: string; role?: string }).id).toBe(TEST_IDENTITIES.admin.id);
+      expect((session?.user as { id?: string; role?: string }).role).toBe('admin');
+    });
+
     it('should add user role to session from JWT token', async () => {
       // Session callback should map JWT claims to Session object
       const expectedSession: Partial<AuthorizedSession> = {
@@ -47,25 +222,13 @@ describe('Auth Configuration', () => {
     });
 
     it('should include admin role for allowlisted users', async () => {
-      const adminEmail = 'admin@example.com';
-
-      const expectedSession: Partial<AuthorizedSession> = {
-        user: {
-          id: 'admin-123',
-          email: adminEmail,
-          role: 'admin',
-        },
-      };
+      const expectedSession = createMockSession('admin');
 
       expect(expectedSession.user?.role).toBe('admin');
     });
 
     it('should default to organizer role for non-allowlisted users', async () => {
-      const mockJWT: JWT = {
-        sub: 'new-user-123',
-        email: 'newuser@example.com',
-        role: 'organizer', // Default non-admin role
-      };
+      const mockJWT = createMockJwt('organizer');
 
       expect(mockJWT.role).toBe('organizer');
     });
@@ -89,6 +252,26 @@ describe('Auth Configuration', () => {
   });
 
   describe('Magic-Link Email Configuration', () => {
+    it('issues magic-link and creates a consumable authentication token', () => {
+      const result = issueMagicLink('integration@pluginbim.com');
+
+      expect('error' in result).toBe(false);
+      if ('error' in result) {
+        throw new Error('Expected issued token but got rate-limited response');
+      }
+
+      expect(verifyMagicLinkToken('integration@pluginbim.com', result.token)).toBe(true);
+    });
+
+    it('denies magic-link issuance after threshold is reached', () => {
+      for (let index = 0; index < 5; index += 1) {
+        const result = issueMagicLink('limited@pluginbim.com');
+        expect('error' in result).toBe(false);
+      }
+
+      expect(issueMagicLink('limited@pluginbim.com')).toEqual({ error: 'rate_limited' });
+    });
+
     it('should send magic-link emails with secure token valid for 15 minutes', () => {
       // Magic-link flow:
       // 1. User enters email
@@ -158,9 +341,8 @@ describe('Auth Configuration', () => {
 
   describe('Session Expiration and Timeout', () => {
     it('should expire sessions after configured inactivity period', () => {
-      // Default Auth.js maxAge or custom timeout should be enforced
-      // Expired sessions should redirect to login
-      expect(true).toBe(true); // Placeholder
+      const maxAgeSeconds = authConfig.session?.maxAge;
+      expect(maxAgeSeconds).toBe(24 * 60 * 60);
     });
 
     it('should handle refresh token rotation for long-lived sessions', () => {
@@ -233,9 +415,8 @@ describe('Security - Timeout and Attack Prevention (T084)', () => {
     });
 
     it('should enforce session timeout after inactivity', () => {
-      // Auth.js maxAge should be enforced
-      const maxAgeSeconds = 30 * 24 * 60 * 60; // 30 days
-      expect(maxAgeSeconds).toBeGreaterThan(0);
+      const maxAgeSeconds = authConfig.session?.maxAge;
+      expect(maxAgeSeconds).toBe(24 * 60 * 60);
     });
 
     it('should handle gracefully when tokens expire', () => {

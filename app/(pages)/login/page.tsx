@@ -7,19 +7,48 @@
 
 import { useSearchParams } from 'next/navigation';
 import { signIn } from 'next-auth/react';
-import { Suspense, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
+
+function resolveSafeCallbackUrl(rawValue: string | null): string {
+  if (!rawValue?.startsWith('/')) {
+    return '/dashboard';
+  }
+
+  if (rawValue.startsWith('/dashboard') || rawValue.startsWith('/admin')) {
+    return rawValue;
+  }
+
+  return '/dashboard';
+}
+
+function mapProviderError(error: string | null): string | null {
+  if (!error) {
+    return null;
+  }
+
+  if (error === 'OAuthSignin' || error === 'OAuthCallback' || error === 'AccessDenied') {
+    return 'Google sign-in failed. You can retry or continue with a magic link.';
+  }
+
+  return 'Authentication failed. Please try again.';
+}
 
 function LoginPageContent() {
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
+  const callbackUrl = resolveSafeCallbackUrl(searchParams.get('callbackUrl'));
   const error = searchParams.get('error');
 
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
-  const [loginError, setLoginError] = useState<string | null>(
-    error ? 'Authentication failed' : null,
-  );
+  const [loginError, setLoginError] = useState<string | null>(mapProviderError(error));
+  const errorRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (loginError) {
+      errorRef.current?.focus();
+    }
+  }, [loginError]);
 
   /**
    * Handle Google OAuth sign-in
@@ -59,7 +88,11 @@ function LoginPageContent() {
       });
 
       if (result?.error) {
-        setLoginError('Failed to send sign-in link. Please try again.');
+        if (result.error.includes('rate')) {
+          setLoginError('Too many magic-link requests. Please try again in an hour.');
+        } else {
+          setLoginError('Failed to send sign-in link. Please try again.');
+        }
       } else {
         setEmailSent(true);
       }
@@ -109,7 +142,13 @@ function LoginPageContent() {
 
         {/* Error message */}
         {loginError && (
-          <div role="alert" className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <div
+            id="login-error"
+            ref={errorRef}
+            role="alert"
+            tabIndex={-1}
+            className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg"
+          >
             <p className="text-red-700 text-sm font-medium">{loginError}</p>
           </div>
         )}
@@ -119,6 +158,7 @@ function LoginPageContent() {
           type="button"
           onClick={handleGoogleSignIn}
           disabled={isLoading}
+          aria-describedby={loginError ? 'login-error' : undefined}
           className="w-full mb-4 px-4 py-3 bg-white border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#667eea] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {isLoading ? 'Signing in...' : 'Sign in with Google'}
@@ -155,6 +195,7 @@ function LoginPageContent() {
           <button
             type="submit"
             disabled={isLoading}
+            aria-describedby={loginError ? 'login-error' : undefined}
             className="w-full px-4 py-3 bg-[#667eea] hover:bg-[#764ba2] text-white font-semibold rounded-lg focus:outline-none focus:ring-2 focus:ring-[#667eea] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {isLoading ? 'Sending sign-in link...' : 'Send sign-in link'}
