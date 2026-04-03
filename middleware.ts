@@ -136,6 +136,6 @@ export const config = {
      * - favicon.ico, sitemap.xml, robots.txt (public files)
      * - _vercel (Vercel internals)
      */
-    String.raw`/((?!_next|static|favicon\.ico|sitemap\.xml|robots\.txt|_vercel).*)`,
+    '/((?!_next|static|favicon\\.ico|sitemap\\.xml|robots\\.txt|_vercel).*)',
   ],
 };

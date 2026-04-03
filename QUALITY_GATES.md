@@ -9,11 +9,30 @@ active blocking gate as the stack grows.
 - ESLint
 - TypeScript type checking
 - Jest CI coverage run
+- BDD scenario tests via `test:bdd`
 - Biome check when `biome.json` exists
 - staged secret scan
 - focused test detection
 - PostgreSQL migration validation when migration directories exist
 - container image scan when a `Dockerfile` exists
+
+## Activate BDD Gate
+
+Add a dedicated script in `package.json`:
+
+```json
+{
+  "scripts": {
+    "test:bdd": "jest --runInBand --testPathPatterns=.bdd.test.ts"
+  }
+}
+```
+
+Recommended tooling:
+
+- `jest-cucumber` for Gherkin-style behavior tests running inside Jest
+
+Once `test:bdd` exists, `npm run gates:bdd` becomes a blocking gate and runs as part of `gates:ci`.
 
 ## Activate Git Hooks
 
