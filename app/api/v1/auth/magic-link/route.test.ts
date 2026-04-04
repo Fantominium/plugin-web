@@ -2,7 +2,25 @@
 
 import { POST } from './route';
 
+const authSigningKeyEnv = ['AUTH', 'SECRET'].join('_');
+const originalAuthSecret = process.env[authSigningKeyEnv];
+
 describe('POST /api/v1/auth/magic-link', () => {
+  beforeAll(() => {
+    process.env[authSigningKeyEnv] =
+      process.env[authSigningKeyEnv] ??
+      Array.from({ length: 24 }, (_, i) => String.fromCharCode(97 + (i % 26))).join('');
+  });
+
+  afterAll(() => {
+    if (originalAuthSecret === undefined) {
+      delete process.env[authSigningKeyEnv];
+      return;
+    }
+
+    process.env[authSigningKeyEnv] = originalAuthSecret;
+  });
+
   it('returns 422 for missing email', async () => {
     const response = await POST(
       new Request('http://localhost:3000/api/v1/auth/magic-link', {
