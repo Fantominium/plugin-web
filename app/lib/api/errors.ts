@@ -7,8 +7,9 @@ const statusByCode: Record<ApiErrorCode, number> = {
   forbidden: 403,
   not_found: 404,
   conflict: 409,
-  timeout: 504,
   internal_error: 500,
+  rate_limited: 429,
+  timeout: 504,
 };
 
 export function buildApiError(code: ApiErrorCode, message: string, details?: unknown): ApiError {

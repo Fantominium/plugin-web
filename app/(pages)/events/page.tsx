@@ -5,7 +5,7 @@ export default async function EventsPage() {
   const eventList = await fetchEventList({ page: 1, limit: 24 });
 
   return (
-    <main id="main-content" className="mx-auto max-w-6xl px-4 py-12">
+    <div className="mx-auto max-w-6xl px-4 py-12">
       <header className="mb-8">
         <h1 className="text-4xl font-bold text-[#1a1a2e]">Discover Events</h1>
         <p className="mt-3 text-lg text-[#495057]">Find upcoming events across Barbados.</p>
@@ -35,6 +35,6 @@ export default async function EventsPage() {
           ))}
         </section>
       )}
-    </main>
+    </div>
   );
 }

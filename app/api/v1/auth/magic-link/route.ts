@@ -36,7 +36,7 @@ export async function POST(request: Request) {
 
     if (hitRateLimit(email)) {
       return jsonError(
-        buildApiError('forbidden', 'Too many magic-link requests. Try again later.'),
+        buildApiError('rate_limited', 'Too many magic-link requests. Try again later.'),
       );
     }
 
@@ -51,18 +51,17 @@ export async function POST(request: Request) {
 
     if ('error' in issuedLink) {
       return jsonError(
-        buildApiError('forbidden', 'Too many magic-link requests. Try again in an hour.'),
+        buildApiError('rate_limited', 'Too many magic-link requests. Try again in an hour.'),
       );
     }
 
-    const { token, expiresAt } = issuedLink;
+    const { expiresAt } = issuedLink;
 
     return NextResponse.json(
       {
         data: {
           accepted: true,
           email,
-          tokenPreview: token.slice(0, 8),
           expiresAt: expiresAt.toISOString(),
           ...(sessionId && !csrfToken ? { ['csrf' + 'Token']: createCsrfToken(sessionId) } : {}),
         },

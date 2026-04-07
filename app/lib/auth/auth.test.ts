@@ -1,4 +1,7 @@
 /**
+ * @jest-environment node
+ */
+/**
  * Auth.js configuration and server-side session tests
  * Covers Google OAuth, magic-link flow, session callbacks, and role resolution
  */
@@ -94,14 +97,17 @@ describe('Auth Configuration', () => {
   });
 
   describe('Event callbacks', () => {
-    it('logs sign-in and sign-out events', async () => {
+    it('logs sign-in and sign-out events without exposing plaintext email', async () => {
       const logSpy = jest.spyOn(console, 'log').mockImplementation(() => undefined);
 
       await authConfig.events?.signIn?.({ user: { email: 'logger@example.com' } } as never);
       await authConfig.events?.signOut?.({} as never);
 
-      expect(logSpy).toHaveBeenCalledWith('User logger@example.com signed in');
-      expect(logSpy).toHaveBeenCalledWith('User signed out');
+      expect(logSpy).toHaveBeenCalledWith(
+        'auth.sign_in',
+        expect.objectContaining({ emailHash: expect.any(String) }),
+      );
+      expect(logSpy).toHaveBeenCalledWith('auth.sign_out');
     });
   });
 
@@ -141,7 +147,7 @@ describe('Auth Configuration', () => {
 
       expect(token?.role).toBe('organizer');
       expect(warnSpy).toHaveBeenCalledWith('auth.failure.untrusted_role_claim', {
-        email: TEST_IDENTITIES.organizer.email,
+        emailHash: expect.any(String),
         claimedRole: 'admin',
         resolvedRole: 'organizer',
       });

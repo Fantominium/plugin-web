@@ -76,6 +76,6 @@ describe('POST /api/v1/auth/magic-link', () => {
       }),
     );
 
-    expect(blockedResponse.status).toBe(403);
+    expect(blockedResponse.status).toBe(429);
   });
 });

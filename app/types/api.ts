@@ -5,6 +5,7 @@ export type ApiErrorCode =
   | 'not_found'
   | 'conflict'
   | 'internal_error'
+  | 'rate_limited'
   | 'timeout';
 
 export interface ApiError {

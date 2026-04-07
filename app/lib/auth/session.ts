@@ -34,11 +34,19 @@ export async function requireSession(): Promise<AuthorizedSession> {
     throw new Error('Unsupported role');
   }
 
+  const id = (session.user as BaseSessionUser).id;
+
+  if (!id) {
+    throw new Error(
+      'Session is missing user id; authorization refused to prevent decisions on an invalid identifier',
+    );
+  }
+
   return {
     ...session,
     user: {
       ...session.user,
-      id: (session.user as BaseSessionUser).id ?? '',
+      id,
       role,
     },
   } as AuthorizedSession;

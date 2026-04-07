@@ -12,6 +12,19 @@ import { resolveUserRole } from '@/app/lib/auth/authorize';
 import { prisma } from '@/app/lib/prisma';
 
 /**
+ * Hashes an email address using SHA-256 (first 8 hex chars) for safe log telemetry.
+ * Uses the Web Crypto API so this helper is compatible with the Edge Runtime.
+ */
+async function hashEmail(email: string): Promise<string> {
+  const encoded = new TextEncoder().encode(email.trim().toLowerCase());
+  const buffer = await globalThis.crypto.subtle.digest('SHA-256', encoded);
+  return Array.from(new Uint8Array(buffer))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('')
+    .slice(0, 8);
+}
+
+/**
  * Auth.js configuration
  * Handles session management, providers, callbacks, and security settings
  */
@@ -57,12 +70,12 @@ export const authConfig: NextAuthConfig = {
    */
   events: {
     async signIn({ user }) {
-      // Log successful sign-in
-      console.log(`User ${user.email} signed in`);
+      // Log successful sign-in without exposing plaintext email
+      console.log('auth.sign_in', { emailHash: await hashEmail(user.email ?? '') });
     },
     async signOut() {
       // Log sign-out
-      console.log('User signed out');
+      console.log('auth.sign_out');
     },
   },
 
@@ -97,7 +110,7 @@ export const authConfig: NextAuthConfig = {
 
         if (claimedRole && claimedRole !== role) {
           console.warn('auth.failure.untrusted_role_claim', {
-            email: user.email,
+            emailHash: await hashEmail(user.email ?? ''),
             claimedRole,
             resolvedRole: role,
           });
@@ -151,9 +164,21 @@ export const authConfig: NextAuthConfig = {
   },
 
   /**
-   * Security settings
+   * Security settings — NEXTAUTH_SECRET must be set in all non-development environments.
+   * Auth.js will fail to sign or verify sessions if this is absent.
    */
-  secret: process.env.NEXTAUTH_SECRET || 'dev-secret-please-change',
+  secret: (() => {
+    const secret = process.env.NEXTAUTH_SECRET;
+    if (!secret && process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'test') {
+      throw new Error(
+        'NEXTAUTH_SECRET is required. Set it before starting the server in non-development environments.',
+      );
+    }
+    // Development/test environments may omit the secret; use a clearly-labelled
+    // placeholder so Auth.js can initialise without a configured env var.
+    // This value MUST NOT be used outside of local/CI development contexts.
+    return secret ?? 'dev-only__not-for-production__replace-with-env-var';
+  })(),
 
   /**
    * Disable debug logging in production
@@ -161,9 +186,11 @@ export const authConfig: NextAuthConfig = {
   debug: process.env.NODE_ENV === 'development',
 
   /**
-   * Trust host in development
+   * Only trust the request host in local development.
+   * In staging/production, NEXTAUTH_URL must be explicitly configured so host
+   * validation remains strict and forged Host headers are rejected.
    */
-  trustHost: process.env.NODE_ENV === 'development' || process.env.NEXTAUTH_URL === undefined,
+  trustHost: process.env.NODE_ENV === 'development',
 };
 
 export default authConfig;

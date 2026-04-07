@@ -107,10 +107,7 @@ function LoginPageContent() {
   // Show success message after email sent
   if (emailSent) {
     return (
-      <main
-        id="main-content"
-        className="min-h-screen bg-gradient-to-br from-[#667eea] to-[#764ba2] flex items-center justify-center px-4"
-      >
+      <div className="min-h-screen bg-gradient-to-br from-[#667eea] to-[#764ba2] flex items-center justify-center px-4">
         <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full text-center">
           <h1 className="text-3xl font-bold text-[#1a1a2e] mb-2">Check Your Email</h1>
           <p className="text-gray-600 mb-4">We&apos;ve sent a sign-in link to:</p>
@@ -127,15 +124,12 @@ function LoginPageContent() {
             Back to sign in
           </button>
         </div>
-      </main>
+      </div>
     );
   }
 
   return (
-    <main
-      id="main-content"
-      className="min-h-screen bg-gradient-to-br from-[#667eea] to-[#764ba2] flex items-center justify-center px-4"
-    >
+    <div className="min-h-screen bg-gradient-to-br from-[#667eea] to-[#764ba2] flex items-center justify-center px-4">
       <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full">
         <h1 className="text-3xl font-bold text-[#1a1a2e] mb-2 text-center">Sign In</h1>
         <p className="text-gray-600 text-center mb-8">Sign in to your organizer account</p>
@@ -207,19 +201,14 @@ function LoginPageContent() {
           We&apos;ll send you a magic link via email. Sign in without a password.
         </p>
       </div>
-    </main>
+    </div>
   );
 }
 
 export default function LoginPage() {
   return (
     <Suspense
-      fallback={
-        <main
-          id="main-content"
-          className="min-h-screen bg-gradient-to-br from-[#667eea] to-[#764ba2]"
-        />
-      }
+      fallback={<div className="min-h-screen bg-gradient-to-br from-[#667eea] to-[#764ba2]" />}
     >
       <LoginPageContent />
     </Suspense>

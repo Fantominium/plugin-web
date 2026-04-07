@@ -64,12 +64,16 @@ This agent MUST default to analysis-only unless the user explicitly confirms rem
 2. Add or update tests for behavior changes.
 3. If gate failures appear, fix relevant breakages introduced by the remediation.
 4. Run validation in this order unless user asks otherwise:
-- lint
-- typecheck
-- targeted tests
-- pre-commit gate
-- pre-push gate (includes broader checks like contracts/a11y/e2e as configured)
-5. Report outcomes clearly, including warnings that are non-blocking.
+   - lint
+   - typecheck
+   - targeted tests
+5. **Mandatory final step — run quality gates in this order:**
+   - Stage all changed files: `git add -A` (pre-commit exits silently if nothing is staged)
+   - `bash ./scripts/quality-gates/pre-commit.sh` — secrets scan, lint, typecheck, related Jest tests, Biome formatter
+   - `bash ./scripts/quality-gates/pre-push.sh` — full CI: lint, typecheck, test:ci, BDD, contracts, a11y, e2e
+   - Fix any gate failures before marking the phase complete; iterate up to three times per failing file, then stop and ask the user.
+   - Do not consider the implementation done until both gates exit with code 0.
+6. Report outcomes clearly, including warnings that are non-blocking.
 
 ### Implementation Guardrails (MUST)
 

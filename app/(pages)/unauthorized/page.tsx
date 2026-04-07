@@ -8,10 +8,7 @@ import { PUBLIC_ROUTES } from '@/app/lib/public-routes';
 
 export default function UnauthorizedPage() {
   return (
-    <main
-      id="main-content"
-      className="min-h-screen bg-gradient-to-br from-[#667eea] to-[#764ba2] flex items-center justify-center px-4"
-    >
+    <div className="min-h-screen bg-gradient-to-br from-[#667eea] to-[#764ba2] flex items-center justify-center px-4">
       <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full text-center">
         <div className="mb-6">
           <div className="text-6xl font-bold text-[#ff6b6b] mb-4">403</div>
@@ -40,6 +37,6 @@ export default function UnauthorizedPage() {
           </Link>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

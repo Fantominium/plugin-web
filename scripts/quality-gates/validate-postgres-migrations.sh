@@ -20,7 +20,7 @@ if [[ -z "${MIGRATION_VALIDATE_COMMAND:-}" ]]; then
   if [[ -d "$REPO_ROOT/prisma/migrations" ]]; then
     MIGRATION_VALIDATE_COMMAND="yarn prisma migrate status"
   else
-    fail "Migration directory exists but MIGRATION_VALIDATE_COMMAND is not configured"
+    fail "No migration directory found and MIGRATION_VALIDATE_COMMAND is not configured"
   fi
 fi
 

@@ -28,9 +28,11 @@ services:
     environment:
       DATABASE_URL: postgresql://plugin_user:${POSTGRES_PASSWORD:-postgres}@postgres:5432/plugin_dev
       AUTH_URL: http://localhost:3000
-      AUTH_SECRET: change-me
+      # AUTH_SECRET and NEXTAUTH_SECRET must be provided via a .env file or host environment.
+      # Do not use fixed placeholder values; see docs/dev-setup.md for local configuration.
+      AUTH_SECRET: ${AUTH_SECRET}
       NEXTAUTH_URL: http://localhost:3000
-      NEXTAUTH_SECRET: change-me
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
       POSTER_STORAGE_DIR: /app/storage/posters
     ports:
       - "3000:3000"
