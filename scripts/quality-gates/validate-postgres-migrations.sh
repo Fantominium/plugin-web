@@ -17,7 +17,11 @@ if [[ -z "${DATABASE_URL:-}" ]]; then
 fi
 
 if [[ -z "${MIGRATION_VALIDATE_COMMAND:-}" ]]; then
-  fail "Migration directory exists but MIGRATION_VALIDATE_COMMAND is not configured"
+  if [[ -d "$REPO_ROOT/prisma/migrations" ]]; then
+    MIGRATION_VALIDATE_COMMAND="yarn prisma migrate status"
+  else
+    fail "No migration directory found and MIGRATION_VALIDATE_COMMAND is not configured"
+  fi
 fi
 
 info "Checking PostgreSQL connectivity"

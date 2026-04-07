@@ -1,0 +1,44 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: plugin-web-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: plugin_dev
+      POSTGRES_USER: plugin_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U plugin_user -d plugin_dev"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: plugin-web-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://plugin_user:${POSTGRES_PASSWORD:-postgres}@postgres:5432/plugin_dev
+      AUTH_URL: http://localhost:3000
+      # AUTH_SECRET and NEXTAUTH_SECRET must be provided via a .env file or host environment.
+      # Do not use fixed placeholder values; see docs/dev-setup.md for local configuration.
+      AUTH_SECRET: ${AUTH_SECRET}
+      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+      POSTER_STORAGE_DIR: /app/storage/posters
+    ports:
+      - "3000:3000"
+    volumes:
+      - poster-storage:/app/storage/posters
+
+volumes:
+  postgres-data:
+  poster-storage:

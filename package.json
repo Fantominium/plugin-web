@@ -13,6 +13,9 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "test:ci": "jest --ci --coverage --runInBand",
+    "test:bdd": "jest --runInBand --testPathPatterns=.bdd.test.ts",
+    "test:a11y": "playwright test e2e/public/homepage.a11y.spec.ts e2e/public/contact.a11y.spec.ts",
+    "gates:bdd": "bash ./scripts/quality-gates/validate-bdd.sh",
     "gates:e2e": "bash ./scripts/quality-gates/validate-e2e.sh",
     "gates:a11y": "bash ./scripts/quality-gates/validate-accessibility.sh",
     "gates:contracts": "bash ./scripts/quality-gates/validate-contracts.sh",
@@ -20,16 +23,33 @@
     "gates:prepush": "bash ./scripts/quality-gates/pre-push.sh",
     "gates:ci": "bash ./scripts/quality-gates/ci.sh",
     "gates:postgres": "bash ./scripts/quality-gates/validate-postgres-migrations.sh",
-    "hooks:install": "git config core.hooksPath .githooks"
+    "hooks:install": "git config core.hooksPath .githooks",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:seed": "prisma db seed",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "lighthouse:ci": "lhci autorun",
+    "contracts:sync": "cp specs/001-pluginbim-public-and-organizer-rework/contracts/openapi-v1.yaml contracts/openapi.yaml",
+    "contracts:lint": "redocly lint contracts/openapi.yaml",
+    "contracts:validate": "yarn contracts:sync && yarn contracts:lint",
+    "test:contracts": "yarn contracts:validate"
   },
   "dependencies": {
+    "@auth/prisma-adapter": "^2.11.0",
+    "@prisma/client": "^6.7.0",
     "@types/testing-library__react": "^10.2.0",
     "jest": "^30.2.0",
-    "next": "16.1.4",
+    "next": "16.1.5",
+    "next-auth": "^5.0.0-beta.29",
     "react": "19.2.3",
     "react-dom": "19.2.3"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
+    "@lhci/cli": "^0.14.0",
+    "@playwright/test": "^1.52.0",
+    "@redocly/cli": "^1.31.1",
     "@tailwindcss/postcss": "^4",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.9.1",
@@ -40,9 +60,25 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "16.1.4",
+    "eslint-config-next": "16.1.5",
+    "jest-cucumber": "^4.5.0",
     "jest-environment-jsdom": "^30.2.0",
+    "lighthouse": "^12.6.1",
+    "openapi-typescript": "^7.7.0",
+    "prisma": "^6.7.0",
+    "resend": "^4.5.1",
     "tailwindcss": "^4",
+    "ts-node": "^10.9.2",
     "typescript": "^5"
+  },
+  "prisma": {
+    "seed": "ts-node --transpile-only prisma/seed.ts"
+  },
+  "resolutions": {
+    "effect": "^3.20.0",
+    "flatted": "^3.4.2",
+    "handlebars": "^4.7.9",
+    "picomatch": "^4.0.4",
+    "minimatch": "^3.1.3"
   }
 }

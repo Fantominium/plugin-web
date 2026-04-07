@@ -238,6 +238,15 @@
   }
 }
 
+.tabIcon {
+  font-size: 16px;
+  transition: transform 0.2s ease;
+
+  @media (max-width: 1024px) {
+    font-size: 14px;
+  }
+}
+
 .categoryTab {
   display: flex;
   align-items: center;
@@ -278,15 +287,6 @@
   &:focus {
     outline: 2px solid rgba(255, 107, 107, 0.5);
     outline-offset: 2px;
-  }
-}
-
-.tabIcon {
-  font-size: 16px;
-  transition: transform 0.2s ease;
-
-  @media (max-width: 1024px) {
-    font-size: 14px;
   }
 }
 

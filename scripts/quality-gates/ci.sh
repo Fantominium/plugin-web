@@ -10,6 +10,7 @@ require_command npm
 run_cmd npm run lint
 run_cmd npm run typecheck
 run_cmd npm run test:ci
+run_cmd npm run gates:bdd
 run_cmd npm run gates:contracts
 run_cmd npm run gates:a11y
 run_cmd npm run gates:e2e

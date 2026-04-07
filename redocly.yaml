@@ -1,0 +1,6 @@
+apis:
+  plugin-web-v1:
+    root: ./contracts/openapi.yaml
+
+extends:
+  - recommended

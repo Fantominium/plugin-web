@@ -7,17 +7,98 @@ Plugin Web is a Next.js application for event discovery and related product work
 Run the development server:
 
 ```bash
-npm run dev
+yarn dev
 ```
 
 Open `http://localhost:3000` in your browser.
+
+## Environment Template
+
+Copy `.env.example` to `.env.local` and set local secrets:
+
+```bash
+cp .env.example .env.local
+```
+
+Key runtime values include:
+
+1. `DATABASE_URL` for PostgreSQL
+2. `AUTH_SECRET`/`NEXTAUTH_SECRET` for auth/session signing
+3. `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` for OAuth
+4. `RESEND_API_KEY` and sender email for magic-link delivery
+5. `ADMIN_ALLOWLIST` for admin role resolution
+
+## Local PostgreSQL and Container Runtime
+
+Start only PostgreSQL for local development:
+
+```bash
+docker compose up -d postgres
+```
+
+Start the full containerized stack:
+
+```bash
+docker compose up --build
+```
+
+## Prisma and Contracts Tooling
+
+Generate Prisma client and run migrations:
+
+```bash
+yarn prisma:generate
+yarn prisma:migrate
+```
+
+Sync and lint repository OpenAPI contract:
+
+```bash
+yarn contracts:sync
+yarn contracts:lint
+```
+
+Seed development data (including designated admin test user):
+
+```bash
+yarn prisma:seed
+```
+
+## Test Admin Credentials
+
+For local testing, the Prisma seed creates a designated admin user:
+
+1. Email: `admin@pluginbim.com`
+2. Role: `admin`
+3. Display Name: `Designated Admin User (Test)`
+
+Authentication notes:
+
+1. This app uses OAuth and email magic-link auth (no local password credential).
+2. Use Google or magic-link sign-in with the seeded email to obtain admin role behavior.
+3. Ensure `ADMIN_ALLOWLIST` includes `admin@pluginbim.com` (default config already includes it).
+
+## Browser and UX Validation
+
+Install Playwright browsers once:
+
+```bash
+yarn playwright install
+```
+
+Run end-to-end and Lighthouse checks:
+
+```bash
+yarn test:e2e
+yarn lighthouse:ci
+```
 
 ## Quality Gates
 
 Install local hooks once per clone:
 
 ```bash
-npm run hooks:install
+yarn hooks:install
 ```
 
 Additional gate activation details live in `QUALITY_GATES.md`.
